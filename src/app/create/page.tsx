@@ -1,6 +1,6 @@
 "use client";
 
-import SpiroControls from "./SprioControls";
+import SpiroControls from "./SpiroControls";
 
 export default function CreatePage() {
   return (
