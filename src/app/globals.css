@@ -15,7 +15,7 @@
   --color-accent: var(--accent);
   --color-secondary: var(--secondary);
   --color-tertiary: var(--tertiary);
-  --font-syne: var(--font-syne), Arial, Helvetica, sans-serif;
+  --font-space-mono: var(--font-space-mono), Arial, Helvetica, sans-serif;
   --font-dm-sans: var(--font-dm-sans), monospace;
 }
 
@@ -26,5 +26,5 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-syne), Arial, Helvetica, sans-serif;
+  font-family: var(--font-space-mono), Arial, Helvetica, sans-serif;
 }
