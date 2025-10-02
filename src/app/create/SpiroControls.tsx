@@ -178,14 +178,18 @@ export default function SpiroControls({
           <label htmlFor="speed-slider" className="text-sm font-medium">
             Speed
           </label>
-          <CustomSlider
-            id="speed-slider"
-            min={1}
-            max={10}
-            step={1}
-            value={[speed]}
-            onValueChange={(value) => setSpeed((value as number[])[0])}
-          />
+          <div className="flex items-center gap-2">
+            <span className="text-xs">{speed}x</span>
+            <CustomSlider
+              id="speed-slider"
+              min={0.5}
+              max={3}
+              step={0.5}
+              value={[speed]}
+              onValueChange={(value) => setSpeed((value as number[])[0])}
+              style={{ flex: 1 }}
+            />
+          </div>
         </div>
 
         <hr className="my-8" />
