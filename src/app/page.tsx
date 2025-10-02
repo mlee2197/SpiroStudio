@@ -24,7 +24,7 @@ export default function Home() {
         style={{ zIndex: 0 }}
       />
       <header className="text-center px-8">
-        <h1 className="text-4xl text-primary font-medium mb-2">SpiralCraft</h1>
+        <h1 className="text-4xl text-primary font-medium mb-2">SpiroStudio</h1>
         <h2 className="max-w-xl mb-8 mx-auto text-xl text-secondary">
           Create mesmerizing geometric art with the timeless beauty of
           spirographs
