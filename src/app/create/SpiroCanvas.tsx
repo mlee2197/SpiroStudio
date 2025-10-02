@@ -63,6 +63,8 @@ export default function SpiroCanvas({
   onRefresh,
   onExport,
 }: SpiroCanvasProps) {
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     const canvas = canvasRef?.current;
     if (!canvas) return;
@@ -307,6 +309,44 @@ export default function SpiroCanvas({
     instantDraw,
   ]);
 
+  // handle dynamic canvas size
+  useEffect(() => {
+    const updateSize = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        if (canvasRef.current) {
+          // Only update the canvas size if it actually changed, to avoid rescaling artifacts
+          const displayWidth = Math.floor(width);
+          const displayHeight = Math.floor(height);
+          const pixelWidth = Math.floor(width * devicePixelRatio);
+          const pixelHeight = Math.floor(height * devicePixelRatio);
+
+          // Only reset the canvas size if it changed, to avoid rescaling the context
+          if (
+            canvasRef.current.width !== pixelWidth ||
+            canvasRef.current.height !== pixelHeight
+          ) {
+            canvasRef.current.width = pixelWidth;
+            canvasRef.current.height = pixelHeight;
+          }
+          canvasRef.current.style.width = `${displayWidth}px`;
+          canvasRef.current.style.height = `${displayHeight}px`;
+
+          // Always reset the transform before scaling to avoid compounding
+          const ctx = canvasRef.current.getContext("2d");
+          if (ctx) {
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(devicePixelRatio, devicePixelRatio);
+          }
+        }
+      }
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, [canvasRef]);
+
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (isAnimating || !canvasRef?.current) return;
 
@@ -314,17 +354,14 @@ export default function SpiroCanvas({
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
     setPathPoints([...pathPoints, { x, y }]);
   };
 
   return (
-    <div className="relative w-full flex-grow">
+    <div ref={containerRef} className="relative w-full flex-grow">
       <div className="absolute top-4 left-4">
         <Collapsible defaultOpen>
           <div className="flex gap-2">
@@ -346,8 +383,8 @@ export default function SpiroCanvas({
       </div>
       <canvas
         ref={canvasRef}
-        width={800}
-        height={600}
+        // width={800}
+        // height={600}
         className="w-full border border-border rounded-lg cursor-crosshair"
         style={{ backgroundColor }}
         onClick={handleCanvasClick}
