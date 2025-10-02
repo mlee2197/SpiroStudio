@@ -1,13 +1,27 @@
 import { PathPreset, Point } from "@/types";
 
-export const generatePresetPath = (preset: PathPreset) => {
-  const centerX = 400;
-  const centerY = 300;
+export const generatePresetPath = ({
+  preset,
+  centerX,
+  centerY,
+  height,
+  width,
+}: {
+  preset: PathPreset;
+  centerX: number;
+  centerY: number;
+  height: number;
+  width: number;
+}) => {
   const points: Point[] = [];
+  // Padding to keep shapes away from the edge
+  const padding = 64;
+  // Use the smallest side minus padding for max size
+  const maxSide = Math.min(width, height) - 2 * padding;
 
   switch (preset) {
     case "circle": {
-      const radius = 200;
+      const radius = maxSide / 2;
       for (let i = 0; i < 60; i++) {
         const angle = (i / 60) * Math.PI * 2;
         points.push({
@@ -18,8 +32,8 @@ export const generatePresetPath = (preset: PathPreset) => {
       break;
     }
     case "ellipse": {
-      const radiusX = 250;
-      const radiusY = 150;
+      const radiusX = (width - 2 * padding) / 2;
+      const radiusY = (height - 2 * padding) / 2;
       for (let i = 0; i < 60; i++) {
         const angle = (i / 60) * Math.PI * 2;
         points.push({
@@ -30,7 +44,7 @@ export const generatePresetPath = (preset: PathPreset) => {
       break;
     }
     case "square": {
-      const size = 300;
+      const size = maxSide;
       const half = size / 2;
       const pointsPerSide = 15;
       // Top
@@ -65,7 +79,7 @@ export const generatePresetPath = (preset: PathPreset) => {
     }
     case "polygon": {
       const sides = 6;
-      const radius = 200;
+      const radius = maxSide / 2;
       for (let i = 0; i < sides; i++) {
         const angle = (i / sides) * Math.PI * 2 - Math.PI / 2;
         points.push({
@@ -76,8 +90,8 @@ export const generatePresetPath = (preset: PathPreset) => {
       break;
     }
     case "star": {
-      const outerRadius = 220;
-      const innerRadius = 100;
+      const outerRadius = maxSide / 2;
+      const innerRadius = outerRadius * 0.45;
       const spikes = 5;
       for (let i = 0; i < spikes * 2; i++) {
         const radius = i % 2 === 0 ? outerRadius : innerRadius;
@@ -90,11 +104,11 @@ export const generatePresetPath = (preset: PathPreset) => {
       break;
     }
     case "sine": {
-      const amplitude = 100;
+      const amplitude = (height - 2 * padding) / 4;
       const frequency = 3;
-      const width = 500;
+      const sineWidth = width - 2 * padding;
       for (let i = 0; i < 100; i++) {
-        const x = centerX - width / 2 + (width * i) / 100;
+        const x = centerX - sineWidth / 2 + (sineWidth * i) / 100;
         const y =
           centerY + Math.sin((i / 100) * Math.PI * 2 * frequency) * amplitude;
         points.push({ x, y });
@@ -103,7 +117,7 @@ export const generatePresetPath = (preset: PathPreset) => {
     }
     case "spiral": {
       const turns = 3;
-      const maxRadius = 200;
+      const maxRadius = maxSide / 2;
       for (let i = 0; i < 100; i++) {
         const angle = (i / 100) * Math.PI * 2 * turns;
         const radius = (i / 100) * maxRadius;
@@ -112,7 +126,7 @@ export const generatePresetPath = (preset: PathPreset) => {
           y: centerY + Math.sin(angle) * radius,
         });
       }
-    break;
+      break;
     }
   }
 
@@ -133,7 +147,10 @@ const getTotalPathLength = (pathPoints: Point[]): number => {
   return length;
 };
 
-export const getPointOnPath = (progress: number, pathPoints: Point[]): Point => {
+export const getPointOnPath = (
+  progress: number,
+  pathPoints: Point[]
+): Point => {
   if (pathPoints.length < 2) return pathPoints[0] || { x: 0, y: 0 };
 
   const totalLength = getTotalPathLength(pathPoints);

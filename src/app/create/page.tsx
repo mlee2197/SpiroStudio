@@ -1,146 +1,75 @@
 "use client";
 
-import { useRef, useState } from "react";
-import SpiroControls from "./SpiroControls";
-import { PenStyle, Point } from "@/types";
-import SpiroCanvas from "./SpiroCanvas";
+import { PenStyle } from "@/types";
 import Link from "next/link";
+import { useCanvas } from "@/hooks/useCanvas";
+import Collapsible from "@/components/Collapsible";
+import IconButton from "@/components/IconButton";
+import CustomSlider from "@/components/Slider";
+import CustomSwitch from "@/components/Switch";
+import { INSTRUCTIONS, PRESET_BUTTONS } from "@/helpers/variables";
+import { Button } from "@/components/Button";
+import CustomPopover from "@/components/Popover";
+import { useControls } from "@/hooks/useControls";
+import { useDrawing } from "@/hooks/useDrawing";
 
 export default function CreatePage() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { containerRef, canvasRef } = useCanvas();
+  const {
+    showCircle,
+    setShowCircle,
+    showPath,
+    setShowPath,
+    instantDraw,
+    setInstantDraw,
+    speed,
+    setSpeed,
+    outerCircleRadius,
+    setOuterCircleRadius,
+    outerPenDistance,
+    setOuterPenDistance,
+    innerCircleEnabled,
+    setInnerCircleEnabled,
+    innerCircleRadius,
+    setInnerCircleRadius,
+    innerPenDistance,
+    setInnerPenDistance,
+    penStyle,
+    setPenStyle,
+    penSize,
+    setPenSize,
+    lineColor,
+    setLineColor,
+    backgroundColor,
+    setBackgroundColor,
+  } = useControls();
 
-  const [pathPoints, setPathPoints] = useState<Point[]>([]);
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  const [outerCircleRadius, setOuterCircleRadius] = useState(50);
-  const [outerPenDistance, setOuterPenDistance] = useState(30);
-  const [outerPenStyle, setOuterPenStyle] = useState<PenStyle>("line");
-  const [outerPenSize, setOuterPenSize] = useState(2);
-
-  const [innerCircleEnabled, setInnerCircleEnabled] = useState(false);
-  const [innerCircleRadius, setInnerCircleRadius] = useState(30);
-  const [innerPenDistance, setInnerPenDistance] = useState(20);
-
-  const [speed, setSpeed] = useState(2);
-
-  const [lineColor, setLineColor] = useState("#3b82f6");
-  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
-
-  const [instantDraw, setInstantDraw] = useState(false);
-  const [showCircle, setShowCircle] = useState(true);
-  const [showPath, setShowPath] = useState(true);
-
-  const animationRef = useRef<number>(null);
-  const spirographPointsRef = useRef<Point[]>([]);
-  const pathProgressRef = useRef(0);
-  const outerAngleRef = useRef(0);
-  const innerAngleRef = useRef(0);
-
-  const toggleAnimation = () => {
-    if (pathPoints.length < 2) {
-      alert("Please draw a path with at least 2 points!");
-      return;
-    }
-
-    if (isAnimating) {
-      setIsAnimating(false);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      return;
-    }
-    
-    setIsAnimating(true);
-  };
-
-  const reset = () => {
-    setIsAnimating(false);
-    setPathPoints([]);
-    spirographPointsRef.current = [];
-    pathProgressRef.current = 0;
-    outerAngleRef.current = 0;
-    innerAngleRef.current = 0;
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
-  };
-
-  const clearSpirograph = () => {
-    spirographPointsRef.current = [];
-    setPathPoints([...pathPoints]);
-  };
-
-  const exportImage = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    // Create a temporary canvas to export only the spirograph (without UI elements)
-    const exportCanvas = document.createElement("canvas");
-    exportCanvas.width = canvas.width;
-    exportCanvas.height = canvas.height;
-    const exportCtx = exportCanvas.getContext("2d");
-    if (!exportCtx) return;
-
-    exportCtx.fillStyle = backgroundColor;
-    exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-
-    // Draw the spirograph pattern
-    if (spirographPointsRef.current.length > 0) {
-      const points = spirographPointsRef.current;
-      const penStyle = outerPenStyle;
-      const penSize = outerPenSize;
-
-      if (penStyle === "line" || penStyle === "dashes") {
-        if (penStyle === "dashes") {
-          exportCtx.setLineDash([10, 5]);
-        }
-
-        exportCtx.strokeStyle = lineColor;
-        exportCtx.lineWidth = penSize;
-        exportCtx.lineCap = "round";
-        exportCtx.lineJoin = "round";
-
-        exportCtx.beginPath();
-        exportCtx.moveTo(points[0].x, points[0].y);
-        for (let i = 1; i < points.length; i++) {
-          exportCtx.lineTo(points[i].x, points[i].y);
-        }
-        exportCtx.stroke();
-      } else if (
-        penStyle === "dots" ||
-        penStyle === "circles" ||
-        penStyle === "squares"
-      ) {
-        exportCtx.fillStyle = lineColor;
-        points.forEach((point) => {
-          if (penStyle === "dots") {
-            exportCtx.beginPath();
-            exportCtx.arc(point.x, point.y, penSize / 2, 0, Math.PI * 2);
-            exportCtx.fill();
-          } else if (penStyle === "circles") {
-            exportCtx.strokeStyle = lineColor;
-            exportCtx.lineWidth = 1;
-            exportCtx.beginPath();
-            exportCtx.arc(point.x, point.y, penSize, 0, Math.PI * 2);
-            exportCtx.stroke();
-          } else if (penStyle === "squares") {
-            exportCtx.fillRect(
-              point.x - penSize / 2,
-              point.y - penSize / 2,
-              penSize,
-              penSize
-            );
-          }
-        });
-      }
-    }
-
-    // Download the image
-    const link = document.createElement("a");
-    link.download = `spirograph-${Date.now()}.png`;
-    link.href = exportCanvas.toDataURL("image/png");
-    link.click();
-  };
+  const {
+    clearSpirograph,
+    exportImage,
+    handleCanvasClick,
+    reset,
+    setPresetPath,
+    toggleAnimation,
+    isAnimating,
+  } = useDrawing({
+    canvasRef,
+    controls: {
+      showCircle,
+      showPath,
+      instantDraw,
+      speed,
+      outerCircleRadius,
+      outerPenDistance,
+      innerCircleEnabled,
+      innerCircleRadius,
+      innerPenDistance,
+      penStyle,
+      penSize,
+      lineColor,
+      backgroundColor,
+    },
+  });
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -154,66 +83,312 @@ export default function CreatePage() {
         </Link>
       </div>
       <div className="flex flex-col-reverse items-center justify-center h-[calc(100%-57px)] w-full md:pr-4 md:flex-row">
-        <SpiroControls
-          showCircle={showCircle}
-          showPath={showPath}
-          instantDraw={instantDraw}
-          speed={speed}
-          outerCircleRadius={outerCircleRadius}
-          outerPenDistance={outerPenDistance}
-          outerPenStyle={outerPenStyle}
-          outerPenSize={outerPenSize}
-          innerCircleEnabled={innerCircleEnabled}
-          innerCircleRadius={innerCircleRadius}
-          innerPenDistance={innerPenDistance}
-          lineColor={lineColor}
-          backgroundColor={backgroundColor}
-          setPathPoints={setPathPoints}
-          setLineColor={setLineColor}
-          setBackgroundColor={setBackgroundColor}
-          setShowCircle={setShowCircle}
-          setShowPath={setShowPath}
-          setInstantDraw={setInstantDraw}
-          setSpeed={setSpeed}
-          setOuterCircleRadius={setOuterCircleRadius}
-          setOuterPenDistance={setOuterPenDistance}
-          setOuterPenStyle={setOuterPenStyle}
-          setOuterPenSize={setOuterPenSize}
-          setInnerCircleEnabled={setInnerCircleEnabled}
-          setInnerCircleRadius={setInnerCircleRadius}
-          setInnerPenDistance={setInnerPenDistance}
+        {/* Controls */}
+        <div className="grid grid-rows-[40px_1fr] gap-4 w-full max-w-[360px] h-full p-4">
+          {/* Top Buttons */}
+          <div className="w-full flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Controls</h2>
+            <CustomPopover
+              title="How to use"
+              trigger={
+                <div
+                  className="mr-4 border rounded-full min-w-8 mt-[2px]"
+                  style={{ padding: 4 }}
+                >
+                  ?
+                </div>
+              }
+            >
+              <ol className="list-decimal pl-5 space-y-1">
+                {INSTRUCTIONS.map((item) => (
+                  <li key={item} className="text-sm text-gray-700">
+                    {item}
+                  </li>
+                ))}
+              </ol>
+            </CustomPopover>
+          </div>
 
-        />
+          {/* Settings */}
+          <div className="overflow-auto pb-6">
+            {/* Path Presets */}
+            <div className="grid grid-cols-2 gap-2 overflow-hidden">
+              <h3 className="col-span-2 text-base font-semibold">
+                Path Presets
+              </h3>
+              {PRESET_BUTTONS.map(({ label, icon: Icon, preset }) => (
+                <Button key={preset} onClick={() => setPresetPath(preset)}>
+                  <span className="inline-flex items-center gap-1">
+                    <Icon />
+                    {label}
+                  </span>
+                </Button>
+              ))}
+            </div>
 
-        <SpiroCanvas
-          canvasRef={canvasRef}
-          pathPoints={pathPoints}
-          setPathPoints={setPathPoints}
-          isAnimating={isAnimating}
-          setIsAnimating={setIsAnimating}
-          speed={speed}
-          instantDraw={instantDraw}
-          showCircle={showCircle}
-          showPath={showPath}
-          outerCircleRadius={outerCircleRadius}
-          outerPenDistance={outerPenDistance}
-          outerPenStyle={outerPenStyle}
-          outerPenSize={outerPenSize}
-          innerCircleEnabled={innerCircleEnabled}
-          innerCircleRadius={innerCircleRadius}
-          innerPenDistance={innerPenDistance}
-          lineColor={lineColor}
-          backgroundColor={backgroundColor}
-          spirographPointsRef={spirographPointsRef}
-          pathProgressRef={pathProgressRef}
-          outerAngleRef={outerAngleRef}
-          innerAngleRef={innerAngleRef}
-          animationRef={animationRef}
-          toggleAnimation={toggleAnimation}
-          onErase={clearSpirograph}
-          onRefresh={reset}
-          onExport={exportImage}
-        />
+            <hr className="my-8" />
+
+            {/* Playback Options */}
+            <div className="grid grid-cols-[40%_60%] items-center gap-4 overflow-hidden">
+              <h3 className="col-span-2 text-base font-semibold">
+                Playback Options
+              </h3>
+              <label htmlFor="show-circle" className="text-sm font-medium">
+                Show Circle
+              </label>
+              <CustomSwitch
+                id="show-circle"
+                checked={showCircle}
+                onCheckedChange={setShowCircle}
+              />
+              <label htmlFor="show-path" className="text-sm font-medium">
+                Show Path
+              </label>
+              <CustomSwitch
+                id="show-path"
+                checked={showPath}
+                onCheckedChange={setShowPath}
+              />
+              <label htmlFor="instant-draw" className="text-sm font-medium">
+                Instant Draw
+              </label>
+              <CustomSwitch
+                id="instant-draw"
+                checked={instantDraw}
+                onCheckedChange={setInstantDraw}
+              />
+
+              <label htmlFor="speed-slider" className="text-sm font-medium">
+                Speed
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-xs">{speed}x</span>
+                <CustomSlider
+                  id="speed-slider"
+                  min={0.5}
+                  max={3}
+                  step={0.5}
+                  value={[speed]}
+                  onValueChange={(value) => setSpeed((value as number[])[0])}
+                  style={{ flex: 1 }}
+                />
+              </div>
+            </div>
+
+            <hr className="my-8" />
+
+            {/* Circle Config */}
+            <div className="grid grid-cols-[27%_13%_60%] items-center gap-4 overflow-hidden">
+              <h3 className="col-span-3 text-base font-semibold">
+                Circle Configuration
+              </h3>
+
+              <div className="col-span-3 text-sm font-medium">Outer Circle</div>
+
+              <label
+                htmlFor="outer-radius-slider"
+                className="text-sm font-medium"
+              >
+                Radius
+              </label>
+              <span className="border border-gray-300 rounded-sm text-xs p-1">
+                {outerCircleRadius}px
+              </span>
+              <CustomSlider
+                id="outer-radius-slider"
+                min={20}
+                max={120}
+                step={5}
+                value={[outerCircleRadius]}
+                onValueChange={(value) =>
+                  setOuterCircleRadius((value as number[])[0])
+                }
+              />
+
+              <label
+                htmlFor="inner-distance-slider"
+                className="text-sm font-medium"
+              >
+                Pen Distance
+              </label>
+              <span className="border border-gray-300 rounded-sm text-xs p-1">
+                {outerPenDistance}px
+              </span>
+              <CustomSlider
+                id="inner-distance-slider"
+                min={10}
+                max={outerCircleRadius}
+                step={5}
+                value={[outerPenDistance]}
+                onValueChange={(value) =>
+                  setOuterPenDistance((value as number[])[0])
+                }
+              />
+              <div className="col-span-3" />
+
+              <label
+                htmlFor="inner-circle-switch"
+                className="text-sm font-medium"
+              >
+                Inner Circle
+              </label>
+              <CustomSwitch
+                id="inner-circle-switch"
+                checked={innerCircleEnabled}
+                onCheckedChange={setInnerCircleEnabled}
+              />
+              <div />
+
+              <label
+                htmlFor="inner-radius-slider"
+                className="text-sm font-medium"
+              >
+                Radius
+              </label>
+              <span className="border border-gray-300 rounded-sm text-xs p-1">
+                {innerCircleRadius}px
+              </span>
+              <CustomSlider
+                id="inner-radius-slider"
+                min={15}
+                max={outerCircleRadius / 2}
+                step={5}
+                value={[innerCircleRadius]}
+                onValueChange={(value) =>
+                  setInnerCircleRadius((value as number[])[0])
+                }
+              />
+
+              <label
+                htmlFor="inner-distance-slider"
+                className="text-sm font-medium"
+              >
+                Pen Distance
+              </label>
+              <span className="border border-gray-300 rounded-sm text-xs p-1">
+                {innerPenDistance}px
+              </span>
+              <CustomSlider
+                id="inner-distance-slider"
+                min={10}
+                max={innerCircleRadius}
+                step={5}
+                value={[innerPenDistance]}
+                onValueChange={(value) =>
+                  setInnerPenDistance((value as number[])[0])
+                }
+              />
+            </div>
+
+            <hr className="my-8" />
+
+            {/* Draw Styles */}
+            <div className="grid grid-cols-2 gap-4 items-center overflow-hidden">
+              <h3 className="col-span-2 text-base font-semibold">
+                Draw Styles
+              </h3>
+
+              {/* Pen Color */}
+              <label htmlFor="pen-color" className="text-sm font-medium">
+                Pen Color
+              </label>
+              <input
+                id="pen-color"
+                type="color"
+                value={lineColor}
+                onChange={(e) => setLineColor(e.target.value)}
+                className="w-8 h-8 border rounded"
+              />
+
+              {/* Line Style */}
+              <label htmlFor="line-style" className="text-sm font-medium">
+                Line Style
+              </label>
+              <select
+                id="line-style"
+                className="max-w-32 border rounded px-2 py-1 text-sm"
+                value={penStyle}
+                onChange={(e) => setPenStyle(e.target.value as PenStyle)}
+              >
+                <option value="line">Line</option>
+                <option value="dots">Dots</option>
+                <option value="dashes">Dashes</option>
+                <option value="circles">Circles</option>
+                <option value="squares">Squares</option>
+              </select>
+
+              {/* Pen Size */}
+              <label htmlFor="pen-size" className="text-sm font-medium">
+                Size
+              </label>
+              <div className="flex items-center gap-2">
+                <CustomSlider
+                  id="pen-size"
+                  min={1}
+                  max={10}
+                  step={1}
+                  value={[penSize]}
+                  onValueChange={(value) => setPenSize((value as number[])[0])}
+                  style={{ width: 100 }}
+                />
+                <span className="border border-gray-300 rounded-sm text-xs p-1">
+                  {penSize}px
+                </span>
+              </div>
+
+              {/* Background */}
+              <label htmlFor="background-color" className="text-sm font-medium">
+                Background
+              </label>
+              <input
+                id="background-color"
+                type="color"
+                value={backgroundColor}
+                onChange={(e) => setBackgroundColor(e.target.value)}
+                className="w-8 h-8 border rounded"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Canvas */}
+        <div ref={containerRef} className="relative w-full flex-grow">
+          <div className="absolute top-4 left-4">
+            <Collapsible defaultOpen>
+              <div className="flex gap-2">
+                <IconButton
+                  icon={isAnimating ? "Pause" : "Play"}
+                  tooltip={isAnimating ? "Pause" : "Play"}
+                  onClick={toggleAnimation}
+                />
+                <IconButton
+                  icon="Eraser"
+                  tooltip="Clear Drawing"
+                  onClick={clearSpirograph}
+                />
+                <IconButton
+                  icon="RefreshCcw"
+                  tooltip="Reset all"
+                  bgColor="#ecc1c1"
+                  onClick={reset}
+                />
+                <IconButton
+                  icon="Download"
+                  tooltip="Export PNG"
+                  onClick={exportImage}
+                />
+              </div>
+            </Collapsible>
+          </div>
+          <canvas
+            ref={canvasRef}
+            // width={800}
+            // height={600}
+            className="w-full border border-border rounded-lg cursor-crosshair"
+            style={{ backgroundColor }}
+            onClick={handleCanvasClick}
+          />
+        </div>
       </div>
     </div>
   );
