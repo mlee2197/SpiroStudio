@@ -51,10 +51,6 @@ export default function CreatePage() {
     }
     
     setIsAnimating(true);
-    spirographPointsRef.current = [];
-    pathProgressRef.current = 0;
-    outerAngleRef.current = 0;
-    innerAngleRef.current = 0;
   };
 
   const reset = () => {
