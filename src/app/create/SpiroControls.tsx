@@ -3,6 +3,31 @@ import IconButton from "@/components/IconButton";
 import CustomPopover from "@/components/Popover";
 import CustomSlider from "@/components/Slider";
 import CustomSwitch from "@/components/Switch";
+import { generatePresetPath } from "@/helpers/CanvasUtils";
+import { PathPreset, PenStyle } from "@/types";
+import {
+  CircleIcon,
+  EllipseIcon,
+  PolygonIcon,
+  SineIcon,
+  SpiralIcon,
+  SquareIcon,
+  StarIcon,
+} from "./PresetIcons";
+
+export const PRESET_BUTTONS: {
+  preset: PathPreset;
+  label: string;
+  icon: React.FC;
+}[] = [
+  { preset: "circle", label: "Circle", icon: CircleIcon },
+  { preset: "ellipse", label: "Ellipse", icon: EllipseIcon },
+  { preset: "square", label: "Square", icon: SquareIcon },
+  { preset: "polygon", label: "Polygon", icon: PolygonIcon },
+  { preset: "star", label: "Star", icon: StarIcon },
+  { preset: "sine", label: "Sine Wave", icon: SineIcon },
+  { preset: "spiral", label: "Spiral", icon: SpiralIcon },
+];
 
 const INSTRUCTIONS = [
   "Use path presets or click canvas to draw custom path",
@@ -13,159 +38,112 @@ const INSTRUCTIONS = [
   "Export your creation as PNG",
 ];
 
-export default function SpiroControls() {
+interface SpiroControlsProps {
+  showCircle: boolean;
+  showPath: boolean;
+  instantDraw: boolean;
+  speed: number;
+  outerCircleRadius: number;
+  outerPenDistance: number;
+  outerPenStyle: string;
+  outerPenSize: number;
+  innerCircleEnabled: boolean;
+  innerCircleRadius: number;
+  innerPenDistance: number;
+  lineColor: string;
+  backgroundColor: string;
+  setPathPoints: (points: { x: number; y: number }[]) => void;
+  setLineColor: (color: string) => void;
+  setBackgroundColor: (color: string) => void;
+  setShowCircle: (show: boolean) => void;
+  setShowPath: (show: boolean) => void;
+  setInstantDraw: (instant: boolean) => void;
+  setSpeed: (speed: number) => void;
+  setOuterCircleRadius: (radius: number) => void;
+  setOuterPenDistance: (distance: number) => void;
+  setOuterPenStyle: (style: PenStyle) => void;
+  setOuterPenSize: (size: number) => void;
+  setInnerCircleEnabled: (enabled: boolean) => void;
+  setInnerCircleRadius: (radius: number) => void;
+  setInnerPenDistance: (distance: number) => void;
+}
+
+export default function SpiroControls({
+  showCircle,
+  showPath,
+  instantDraw,
+  speed,
+  outerCircleRadius,
+  outerPenDistance,
+  outerPenStyle,
+  outerPenSize,
+  innerCircleEnabled,
+  innerCircleRadius,
+  innerPenDistance,
+  lineColor,
+  backgroundColor,
+  setPathPoints,
+  setLineColor,
+  setBackgroundColor,
+  setShowCircle,
+  setShowPath,
+  setInstantDraw,
+  setSpeed,
+  setOuterCircleRadius,
+  setOuterPenDistance,
+  setOuterPenStyle,
+  setOuterPenSize,
+  setInnerCircleEnabled,
+  setInnerCircleRadius,
+  setInnerPenDistance,
+}: SpiroControlsProps) {
+  const setPresetPath = (preset: PathPreset) => {
+    const points = generatePresetPath(preset);
+    setPathPoints(points);
+  };
+
   return (
-    <div className="flex flex-col w-full max-h-full p-4">
+    <div className="grid grid-rows-[40px_1fr] gap-4 w-full max-w-[360px] h-full p-4">
+      {/* Top Buttons */}
       <div className="w-full flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Controls</h2>
-        <div className="flex algn-center gap-2">
-          <div>
-            <CustomPopover
-              title="How to use"
-              trigger={
-                <Button
-                  className="mr-auto rounded-full min-w-8 mt-[2px]"
-                  style={{ padding: 4 }}
-                >
-                  ?
-                </Button>
-              }
+        <CustomPopover
+          title="How to use"
+          trigger={
+            <div
+              className="mr-4 border rounded-full min-w-8 mt-[2px]"
+              style={{ padding: 4 }}
             >
-              <ol className="list-decimal pl-5 space-y-1">
-                {INSTRUCTIONS.map((item) => (
-                  <li key={item} className="text-sm text-gray-700">
-                    {item}
-                  </li>
-                ))}
-              </ol>
-            </CustomPopover>
-          </div>
-          <IconButton icon="Play" tooltip="Play" onClick={() => {}} />
-          <IconButton icon="Eraser" tooltip="Erase" onClick={() => {}} />
-          <IconButton
-            icon="RefreshCcw"
-            tooltip="Refresh"
-            bgColor="#ecc1c1"
-            onClick={() => {}}
-          />
-          <IconButton icon="Download" tooltip="Export" onClick={() => {}} />
-        </div>
+              ?
+            </div>
+          }
+        >
+          <ol className="list-decimal pl-5 space-y-1">
+            {INSTRUCTIONS.map((item) => (
+              <li key={item} className="text-sm text-gray-700">
+                {item}
+              </li>
+            ))}
+          </ol>
+        </CustomPopover>
       </div>
 
       {/* Settings */}
-      <div className="flex flex-col h-full gap-8 overflow-auto">
+      <div className="overflow-auto pb-6">
         {/* Path Presets */}
         <div className="grid grid-cols-2 gap-2 overflow-hidden">
           <h3 className="col-span-2 text-base font-semibold">Path Presets</h3>
-          <Button>
-            <span className="inline-flex items-center gap-1">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle
-                  cx="8"
-                  cy="8"
-                  r="6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-              </svg>
-              Circle
-            </span>
-          </Button>
-          <Button>
-            <span className="inline-flex items-center gap-1">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <ellipse
-                  cx="8"
-                  cy="8"
-                  rx="7"
-                  ry="4"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-              </svg>
-              Ellipse
-            </span>
-          </Button>
-          <Button>
-            <span className="inline-flex items-center gap-1">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <rect
-                  x="3"
-                  y="3"
-                  width="10"
-                  height="10"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-              </svg>
-              Square
-            </span>
-          </Button>
-          <Button>
-            <span className="inline-flex items-center gap-1">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <polygon
-                  points="8,2 13,5 13,11 8,14 3,11 3,5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                />
-              </svg>
-              Hexagon
-            </span>
-          </Button>
-          <Button>
-            <span className="inline-flex items-center gap-1">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <polygon
-                  points="8,2 9.76,6.48 14.56,6.48 10.88,9.04 12.64,13.52 8,10.96 3.36,13.52 5.12,9.04 1.44,6.48 6.24,6.48"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                />
-              </svg>
-              Star
-            </span>
-          </Button>
-          <Button>
-            <span className="inline-flex items-center gap-1">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M1 8
-                    C2.33 2.67, 4.67 13.33, 6 8
-                    C7.33 2.67, 9.67 13.33, 11 8
-                    C12.33 2.67, 14.67 13.33, 15 8"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                />
-              </svg>
-              Sine Wave
-            </span>
-          </Button>
-          <Button>
-            <span className="inline-flex items-center gap-1">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M12.5 12.5
-                     Q8 16, 4.5 12.5
-                     Q1 9, 4.5 5.5
-                     Q8 2, 11 5.5
-                     Q13 8, 10 10
-                     Q7 12, 6 10
-                     Q5 8, 7 7
-                     Q9 6, 9.5 8"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                />
-              </svg>
-              Spiral
-            </span>
-          </Button>
+          {PRESET_BUTTONS.map(({ label, icon: Icon, preset }) => (
+            <Button key={preset} onClick={() => setPresetPath(preset)}>
+              <span className="inline-flex items-center gap-1">
+                <Icon />
+                {label}
+              </span>
+            </Button>
+          ))}
         </div>
 
-        <hr />
+        <hr className="my-8" />
 
         {/* Playback Options */}
         <div className="grid grid-cols-[40%_60%] items-center gap-4 overflow-hidden">
@@ -177,24 +155,24 @@ export default function SpiroControls() {
           </label>
           <CustomSwitch
             id="show-circle"
-            checked={true}
-            onCheckedChange={() => {}}
+            checked={showCircle}
+            onCheckedChange={setShowCircle}
           />
           <label htmlFor="show-path" className="text-sm font-medium">
             Show Path
           </label>
           <CustomSwitch
             id="show-path"
-            checked={true}
-            onCheckedChange={() => {}}
+            checked={showPath}
+            onCheckedChange={setShowPath}
           />
           <label htmlFor="instant-draw" className="text-sm font-medium">
             Instant Draw
           </label>
           <CustomSwitch
             id="instant-draw"
-            checked={false}
-            onCheckedChange={() => {}}
+            checked={instantDraw}
+            onCheckedChange={setInstantDraw}
           />
 
           <label htmlFor="speed-slider" className="text-sm font-medium">
@@ -205,12 +183,12 @@ export default function SpiroControls() {
             min={1}
             max={10}
             step={1}
-            value={[5]}
-            onValueChange={() => {}}
+            value={[speed]}
+            onValueChange={(value) => setSpeed((value as number[])[0])}
           />
         </div>
 
-        <hr />
+        <hr className="my-8" />
 
         {/* Circle Config */}
         <div className="grid grid-cols-[27%_13%_60%] items-center gap-4 overflow-hidden">
@@ -218,41 +196,43 @@ export default function SpiroControls() {
             Circle Configuration
           </h3>
 
-          <div className="text-sm font-medium">Outer Circle</div>
-          <div />
-          <div />
+          <div className="col-span-3 text-sm font-medium">Outer Circle</div>
 
           <label htmlFor="outer-radius-slider" className="text-sm font-medium">
             Radius
           </label>
           <span className="border border-gray-300 rounded-sm text-xs p-1">
-            20px
+            {outerCircleRadius}px
           </span>
           <CustomSlider
             id="outer-radius-slider"
-            min={10}
-            max={200}
-            step={1}
-            value={[100]}
-            onValueChange={() => {}}
+            min={20}
+            max={120}
+            step={5}
+            value={[outerCircleRadius]}
+            onValueChange={(value) =>
+              setOuterCircleRadius((value as number[])[0])
+            }
           />
 
           <label
             htmlFor="inner-distance-slider"
             className="text-sm font-medium"
           >
-            Distance
+            Pen Distance
           </label>
           <span className="border border-gray-300 rounded-sm text-xs p-1">
-            50px
+            {outerPenDistance}px
           </span>
           <CustomSlider
             id="inner-distance-slider"
-            min={0}
-            max={100}
-            step={1}
-            value={[50]}
-            onValueChange={() => {}}
+            min={10}
+            max={outerCircleRadius}
+            step={5}
+            value={[outerPenDistance]}
+            onValueChange={(value) =>
+              setOuterPenDistance((value as number[])[0])
+            }
           />
           <div className="col-span-3" />
 
@@ -261,8 +241,8 @@ export default function SpiroControls() {
           </label>
           <CustomSwitch
             id="inner-circle-switch"
-            checked={true}
-            onCheckedChange={() => {}}
+            checked={innerCircleEnabled}
+            onCheckedChange={setInnerCircleEnabled}
           />
           <div />
 
@@ -270,37 +250,41 @@ export default function SpiroControls() {
             Radius
           </label>
           <span className="border border-gray-300 rounded-sm text-xs p-1">
-            20px
+            {innerCircleRadius}px
           </span>
           <CustomSlider
             id="inner-radius-slider"
-            min={10}
-            max={200}
-            step={1}
-            value={[100]}
-            onValueChange={() => {}}
+            min={15}
+            max={outerCircleRadius / 2}
+            step={5}
+            value={[innerCircleRadius]}
+            onValueChange={(value) =>
+              setInnerCircleRadius((value as number[])[0])
+            }
           />
 
           <label
             htmlFor="inner-distance-slider"
             className="text-sm font-medium"
           >
-            Distance
+            Pen Distance
           </label>
           <span className="border border-gray-300 rounded-sm text-xs p-1">
-            50px
+            {innerPenDistance}px
           </span>
           <CustomSlider
             id="inner-distance-slider"
-            min={0}
-            max={100}
-            step={1}
-            value={[50]}
-            onValueChange={() => {}}
+            min={10}
+            max={innerCircleRadius}
+            step={5}
+            value={[innerPenDistance]}
+            onValueChange={(value) =>
+              setInnerPenDistance((value as number[])[0])
+            }
           />
         </div>
 
-        <hr />
+        <hr className="my-8" />
 
         {/* Draw Styles */}
         <div className="grid grid-cols-2 gap-4 items-center overflow-hidden">
@@ -313,7 +297,8 @@ export default function SpiroControls() {
           <input
             id="pen-color"
             type="color"
-            defaultValue="#000000"
+            value={lineColor}
+            onChange={(e) => setLineColor(e.target.value)}
             className="w-8 h-8 border rounded"
           />
 
@@ -323,12 +308,15 @@ export default function SpiroControls() {
           </label>
           <select
             id="line-style"
-            className="border rounded px-2 py-1 text-sm"
-            defaultValue="solid"
+            className="max-w-32 border rounded px-2 py-1 text-sm"
+            value={outerPenStyle}
+            onChange={(e) => setOuterPenStyle(e.target.value as PenStyle)}
           >
-            <option value="solid">Solid</option>
-            <option value="dashed">Dashed</option>
-            <option value="dotted">Dotted</option>
+            <option value="line">Line</option>
+            <option value="dots">Dots</option>
+            <option value="dashes">Dashes</option>
+            <option value="circles">Circles</option>
+            <option value="squares">Squares</option>
           </select>
 
           {/* Pen Size */}
@@ -339,14 +327,14 @@ export default function SpiroControls() {
             <CustomSlider
               id="pen-size"
               min={1}
-              max={20}
+              max={10}
               step={1}
-              value={[4]}
-              onValueChange={() => {}}
+              value={[outerPenSize]}
+              onValueChange={(value) => setOuterPenSize((value as number[])[0])}
               style={{ width: 100 }}
             />
             <span className="border border-gray-300 rounded-sm text-xs p-1">
-              4px
+              {outerPenSize}px
             </span>
           </div>
 
@@ -357,7 +345,8 @@ export default function SpiroControls() {
           <input
             id="background-color"
             type="color"
-            defaultValue="#ffffff"
+            value={backgroundColor}
+            onChange={(e) => setBackgroundColor(e.target.value)}
             className="w-8 h-8 border rounded"
           />
         </div>

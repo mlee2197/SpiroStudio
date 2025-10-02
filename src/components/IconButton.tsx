@@ -19,7 +19,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   tooltip,
   bgColor = "transparent",
   iconColor = "currentColor",
-  size = 24,
+  size = 16,
   position = "bottom",
   onClick,
   className = "",
@@ -33,34 +33,33 @@ const IconButton: React.FC<IconButtonProps> = ({
   }>;
 
   return (
-    <Tooltip.Root>
-      <Tooltip.Trigger>
-        <button
-          type="button"
-          onClick={onClick}
-          className={`flex items-center justify-center border rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-          style={{
-            backgroundColor: bgColor,
-            width: size + 16,
-            height: size + 16,
-          }}
-          disabled={disabled}
-          {...rest}
-        >
-          <LucideIcon size={size} color={iconColor} />
-        </button>
-      </Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Positioner side={position} sideOffset={10}>
-          <Tooltip.Popup className={styles.Popup}>
-            <Tooltip.Arrow className={styles.Arrow}>
-              <ArrowSvg />
-            </Tooltip.Arrow>
-            {tooltip}
-          </Tooltip.Popup>
-        </Tooltip.Positioner>
-      </Tooltip.Portal>
-    </Tooltip.Root>
+    <Tooltip.Provider delay={100}>
+      <Tooltip.Root>
+        <Tooltip.Trigger onClick={onClick} disabled={disabled}>
+          <div
+            className={`flex items-center justify-center border rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+            style={{
+              backgroundColor: bgColor,
+              width: size + 16,
+              height: size + 16,
+            }}
+            {...rest}
+          >
+            <LucideIcon size={size} color={iconColor} />
+          </div>
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Positioner side={position} sideOffset={10}>
+            <Tooltip.Popup className={styles.Popup}>
+              <Tooltip.Arrow className={styles.Arrow}>
+                <ArrowSvg />
+              </Tooltip.Arrow>
+              {tooltip}
+            </Tooltip.Popup>
+          </Tooltip.Positioner>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   );
 };
 
