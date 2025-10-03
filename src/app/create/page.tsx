@@ -12,6 +12,7 @@ import { Button } from "@/components/Button";
 import CustomPopover from "@/components/Popover";
 import { useControls } from "@/hooks/useControls";
 import { useDrawing } from "@/hooks/useDrawing";
+import GridCanvas from "@/components/GridCanvas";
 
 export default function CreatePage() {
   const {
@@ -40,6 +41,8 @@ export default function CreatePage() {
     setShowGrid,
     setSnapToGrid,
     showGrid,
+    gridSize,
+    setGridSize,
     snapToGrid,
     backgroundColor,
     setBackgroundColor,
@@ -116,7 +119,7 @@ export default function CreatePage() {
           <div className="overflow-auto pb-6">
             {/* Path Presets */}
             <div className="grid grid-cols-2 gap-2 p-1 overflow-hidden">
-              <h3 className="col-span-2 text-base font-semibold">
+              <h3 className="col-span-2 text-base text-gray-500">
                 Path Presets
               </h3>
               {PRESET_BUTTONS.map(({ label, icon: Icon, preset }) => (
@@ -131,10 +134,10 @@ export default function CreatePage() {
 
             <hr className="my-8" />
 
-            {/* Playback Options */}
+            {/* Display Options */}
             <div className="grid grid-cols-[40%_60%] items-center gap-4 overflow-hidden">
-              <h3 className="col-span-2 text-base font-semibold">
-                Playback Options
+              <h3 className="col-span-2 text-base text-gray-500">
+                Display Options
               </h3>
               <Button
                 className="col-span-2 text-sm flex items-center gap-2"
@@ -204,7 +207,7 @@ export default function CreatePage() {
                 checked={showPath}
                 onCheckedChange={setShowPath}
               />
-              {/* <label htmlFor="show-grid" className="text-sm font-medium">
+              <label htmlFor="show-grid" className="text-sm font-medium">
                 Show Grid
               </label>
               <CustomSwitch
@@ -212,7 +215,29 @@ export default function CreatePage() {
                 checked={showGrid}
                 onCheckedChange={setShowGrid}
               />
-              <label htmlFor="snap-to-grid" className="text-sm font-medium">
+              {showGrid && (
+                <>
+                  <label
+                    htmlFor="grid-size-slider"
+                    className="text-sm font-medium"
+                  >
+                    Grid Size
+                  </label>
+                  <CustomSlider
+                    id="grid-size-slider"
+                    min={16}
+                    max={64}
+                    step={4}
+                    value={[gridSize]}
+                    unit="px"
+                    onValueChange={(value) =>
+                      setGridSize((value as number[])[0])
+                    }
+                    style={{ flex: 1 }}
+                  />
+                </>
+              )}
+              {/* <label htmlFor="snap-to-grid" className="text-sm font-medium">
                 Snap to Grid
               </label>
               <CustomSwitch
@@ -225,12 +250,12 @@ export default function CreatePage() {
             <hr className="my-8" />
 
             {/* Circle Config */}
-            <div className="grid grid-cols-[27%_13%_60%] items-center gap-4 overflow-hidden">
-              <h3 className="col-span-3 text-base font-semibold">
+            <div className="grid grid-cols-2 items-center gap-4 overflow-hidden">
+              <h3 className="col-span-2 text-base text-gray-500">
                 Circle Configuration
               </h3>
 
-              <div className="col-span-3 text-sm font-medium">Outer Circle</div>
+              <div className="col-span-2 text-sm font-medium">Outer Circle</div>
 
               <label
                 htmlFor="outer-radius-slider"
@@ -238,14 +263,12 @@ export default function CreatePage() {
               >
                 Radius
               </label>
-              <span className="border border-gray-300 rounded-sm text-xs p-1">
-                {outerCircleRadius}px
-              </span>
               <CustomSlider
                 id="outer-radius-slider"
                 min={20}
                 max={120}
                 step={5}
+                unit="px"
                 value={[outerCircleRadius]}
                 onValueChange={(value) =>
                   setOuterCircleRadius((value as number[])[0])
@@ -258,20 +281,17 @@ export default function CreatePage() {
               >
                 Pen Distance
               </label>
-              <span className="border border-gray-300 rounded-sm text-xs p-1">
-                {outerPenDistance}px
-              </span>
               <CustomSlider
                 id="inner-distance-slider"
                 min={10}
                 max={outerCircleRadius}
                 step={5}
+                unit="px"
                 value={[outerPenDistance]}
                 onValueChange={(value) =>
                   setOuterPenDistance((value as number[])[0])
                 }
               />
-              <div className="col-span-3" />
 
               <label
                 htmlFor="inner-circle-switch"
@@ -294,14 +314,12 @@ export default function CreatePage() {
                   >
                     Radius
                   </label>
-                  <span className="border border-gray-300 rounded-sm text-xs p-1">
-                    {innerCircleRadius}px
-                  </span>
                   <CustomSlider
                     id="inner-radius-slider"
                     min={15}
                     max={outerCircleRadius / 2}
                     step={5}
+                    unit="px"
                     value={[innerCircleRadius]}
                     onValueChange={(value) =>
                       setInnerCircleRadius((value as number[])[0])
@@ -314,14 +332,12 @@ export default function CreatePage() {
                   >
                     Pen Distance
                   </label>
-                  <span className="border border-gray-300 rounded-sm text-xs p-1">
-                    {innerPenDistance}px
-                  </span>
                   <CustomSlider
                     id="inner-distance-slider"
                     min={10}
                     max={innerCircleRadius}
                     step={5}
+                    unit="px"
                     value={[innerPenDistance]}
                     onValueChange={(value) =>
                       setInnerPenDistance((value as number[])[0])
@@ -335,7 +351,7 @@ export default function CreatePage() {
 
             {/* Draw Styles */}
             <div className="grid grid-cols-2 gap-4 items-center overflow-hidden">
-              <h3 className="col-span-2 text-base font-semibold">
+              <h3 className="col-span-2 text-base text-gray-500">
                 Draw Styles
               </h3>
 
@@ -390,6 +406,7 @@ export default function CreatePage() {
                   min={1}
                   max={10}
                   step={1}
+                  unit="px"
                   value={[penSize]}
                   onValueChange={(value) => setPenSize((value as number[])[0])}
                   style={{ width: 100 }}
@@ -402,41 +419,51 @@ export default function CreatePage() {
               <label htmlFor="speed-slider" className="text-sm font-medium">
                 Speed
               </label>
-              <div className="flex items-center gap-2">
-                <span className="text-xs">{speed}x</span>
-                <CustomSlider
-                  id="speed-slider"
-                  min={0.5}
-                  max={3}
-                  step={0.5}
-                  value={[speed]}
-                  onValueChange={(value) => setSpeed((value as number[])[0])}
-                  style={{ flex: 1 }}
-                />
-              </div>
+              <CustomSlider
+                id="speed-slider"
+                min={0.5}
+                max={3}
+                step={0.5}
+                value={[speed]}
+                unit="x"
+                onValueChange={(value) => setSpeed((value as number[])[0])}
+                style={{ flex: 1 }}
+              />
             </div>
           </div>
         </div>
 
         {/* Canvas */}
         <div ref={containerRef} className="relative w-full flex-grow">
-          <div className="absolute top-4 left-4">
+          <canvas
+            ref={canvasRef}
+            // width={800}
+            // height={600}
+            className="relative w-full border border-border rounded-lg cursor-crosshair"
+            style={{ backgroundColor }}
+            onClick={handleCanvasClick}
+          />
+          <GridCanvas show={showGrid} gridSize={gridSize} containerRef={containerRef} />
+          <div className="absolute top-4 left-4 z-10">
             <Collapsible defaultOpen>
               <div className="flex gap-2">
                 <IconButton
                   icon={"SkipForward"}
                   tooltip={"Instant Draw"}
                   onClick={instantDrawSpirograph}
+                  bgColor="white"
                 />
                 <IconButton
                   icon={isAnimating ? "Pause" : "Play"}
                   tooltip={isAnimating ? "Pause" : "Play"}
                   onClick={toggleAnimation}
+                  bgColor="white"
                 />
                 <IconButton
                   icon="Eraser"
                   tooltip="Clear Drawing"
                   onClick={clearSpirograph}
+                  bgColor="white"
                 />
                 <IconButton
                   icon="RefreshCcw"
@@ -448,18 +475,11 @@ export default function CreatePage() {
                   icon="Download"
                   tooltip="Export PNG"
                   onClick={exportImage}
+                  bgColor="white"
                 />
               </div>
             </Collapsible>
           </div>
-          <canvas
-            ref={canvasRef}
-            // width={800}
-            // height={600}
-            className="w-full border border-border rounded-lg cursor-crosshair"
-            style={{ backgroundColor }}
-            onClick={handleCanvasClick}
-          />
         </div>
       </div>
     </div>

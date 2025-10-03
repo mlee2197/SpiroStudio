@@ -6,6 +6,7 @@ export function useControls() {
   const [showCircle, setShowCircle] = useState(true);
   const [showPath, setShowPath] = useState(true);
   const [showGrid, setShowGrid] = useState(false);
+  const [gridSize, setGridSize] = useState(32);
   const [snapToGrid, setSnapToGrid] = useState(false);
   const [speed, setSpeed] = useState(1);
 
@@ -49,6 +50,8 @@ export function useControls() {
     setLineColor,
     showGrid,
     setShowGrid,
+    gridSize,
+    setGridSize,
     snapToGrid,
     setSnapToGrid,
     backgroundColor,

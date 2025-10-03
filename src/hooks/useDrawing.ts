@@ -60,6 +60,7 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     const context = canvas.getContext("2d");
     if (!context) return;
     const ctx = context;
+    ctx.clearRect(0,0, canvas.width, canvas.height);
 
     // Helper: Draw the user path (polygon, etc)
     function drawPath() {

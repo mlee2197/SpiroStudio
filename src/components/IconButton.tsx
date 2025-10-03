@@ -37,7 +37,7 @@ const IconButton: React.FC<IconButtonProps> = ({
       <Tooltip.Root>
         <Tooltip.Trigger onClick={onClick} disabled={disabled}>
           <div
-            className={`flex items-center justify-center border rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+            className={`flex items-center justify-center border rounded transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
             style={{
               backgroundColor: bgColor,
               width: size + 16,
