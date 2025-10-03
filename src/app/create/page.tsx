@@ -119,7 +119,7 @@ export default function CreatePage() {
           <div className="overflow-auto pb-6">
             {/* Path Presets */}
             <div className="grid grid-cols-2 gap-2 p-1 overflow-hidden">
-              <h3 className="col-span-2 text-base text-gray-500">
+              <h3 className="col-span-2 text-base text-secondary">
                 Path Presets
               </h3>
               {PRESET_BUTTONS.map(({ label, icon: Icon, preset }) => (
@@ -136,7 +136,7 @@ export default function CreatePage() {
 
             {/* Display Options */}
             <div className="grid grid-cols-[40%_60%] items-center gap-4 overflow-hidden">
-              <h3 className="col-span-2 text-base text-gray-500">
+              <h3 className="col-span-2 text-base text-secondary">
                 Display Options
               </h3>
               <Button
@@ -251,7 +251,7 @@ export default function CreatePage() {
 
             {/* Circle Config */}
             <div className="grid grid-cols-2 items-center gap-4 overflow-hidden">
-              <h3 className="col-span-2 text-base text-gray-500">
+              <h3 className="col-span-2 text-base text-secondary">
                 Circle Configuration
               </h3>
 
@@ -351,7 +351,7 @@ export default function CreatePage() {
 
             {/* Draw Styles */}
             <div className="grid grid-cols-2 gap-4 items-center overflow-hidden">
-              <h3 className="col-span-2 text-base text-gray-500">
+              <h3 className="col-span-2 text-base text-secondary">
                 Draw Styles
               </h3>
 
