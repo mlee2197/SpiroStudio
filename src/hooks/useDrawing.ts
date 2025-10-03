@@ -7,7 +7,6 @@ interface UseDrawingProps {
   controls: {
     showCircle: boolean;
     showPath: boolean;
-    instantDraw: boolean;
     speed: number;
     outerCircleRadius: number;
     outerPenDistance: number;
@@ -35,7 +34,6 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
   const {
     showCircle,
     showPath,
-    instantDraw,
     speed,
     outerCircleRadius,
     outerPenDistance,
@@ -222,11 +220,11 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     showCircle,
     showPath,
   ]);
+
   /**
    * This effect handles the animation of the spirograph drawing.
    *
-   * - If `instantDraw` is true, it draws the entire spirograph in one go (for preview or instant rendering).
-   * - Otherwise, it animates the drawing step by step using requestAnimationFrame.
+   * - It animates the drawing step by step using requestAnimationFrame.
    * - It updates the spirograph points, angles, and path progress, and triggers a re-render by updating pathPoints.
    * - It also ensures that the animation frame is properly cleaned up when the effect is re-run or the component unmounts.
    */
@@ -237,46 +235,6 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
 
     const animate = () => {
       if (isCancelled) return;
-
-      if (instantDraw) {
-        const totalSteps = 1000;
-        // Reset spirograph points for instant draw
-        spirographPointsRef.current = [];
-        // Reset angles and progress for a clean instant draw
-        let localPathProgress = 0;
-        let localOuterAngle = outerAngleRef.current;
-        let localInnerAngle = innerAngleRef.current;
-
-        for (let i = 0; i < totalSteps; i++) {
-          localPathProgress = i / totalSteps;
-          localOuterAngle += 0.1;
-          localInnerAngle += 0.15;
-
-          const currentPos = getPointOnPath(localPathProgress, pathPoints);
-          const outerPenX =
-            currentPos.x + Math.cos(localOuterAngle) * outerPenDistance;
-          const outerPenY =
-            currentPos.y + Math.sin(localOuterAngle) * outerPenDistance;
-
-          if (innerCircleEnabled) {
-            const innerPenX =
-              outerPenX + Math.cos(localInnerAngle) * innerPenDistance;
-            const innerPenY =
-              outerPenY + Math.sin(localInnerAngle) * innerPenDistance;
-            spirographPointsRef.current.push({ x: innerPenX, y: innerPenY });
-          } else {
-            spirographPointsRef.current.push({ x: outerPenX, y: outerPenY });
-          }
-        }
-        // Update refs to match the last state for consistency
-        pathProgressRef.current = 1;
-        outerAngleRef.current = localOuterAngle;
-        innerAngleRef.current = localInnerAngle;
-
-        setIsAnimating(false);
-        setPathPoints([...pathPoints]);
-        return;
-      }
 
       // Normal animation mode
       pathProgressRef.current += speed / 1000;
@@ -329,8 +287,51 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     outerPenDistance,
     innerCircleEnabled,
     innerPenDistance,
-    instantDraw,
   ]);
+
+  // Instant draw function for button (continues from last progress)
+  const instantDrawSpirograph = () => {
+    if (pathPoints.length < 2) {
+      alert("Please draw a path with at least 2 points!");
+      return;
+    }
+    const totalSteps = 1000;
+        // Reset spirograph points for instant draw
+        // spirographPointsRef.current = [];
+        // Reset angles and progress for a clean instant draw
+        let localPathProgress = 0;
+        let localOuterAngle = outerAngleRef.current;
+        let localInnerAngle = innerAngleRef.current;
+
+        for (let i = 0; i < totalSteps; i++) {
+          localPathProgress = i / totalSteps;
+          localOuterAngle += 0.1;
+          localInnerAngle += 0.15;
+
+          const currentPos = getPointOnPath(localPathProgress, pathPoints);
+          const outerPenX =
+            currentPos.x + Math.cos(localOuterAngle) * outerPenDistance;
+          const outerPenY =
+            currentPos.y + Math.sin(localOuterAngle) * outerPenDistance;
+
+          if (innerCircleEnabled) {
+            const innerPenX =
+              outerPenX + Math.cos(localInnerAngle) * innerPenDistance;
+            const innerPenY =
+              outerPenY + Math.sin(localInnerAngle) * innerPenDistance;
+            spirographPointsRef.current.push({ x: innerPenX, y: innerPenY });
+          } else {
+            spirographPointsRef.current.push({ x: outerPenX, y: outerPenY });
+          }
+        }
+        // Update refs to match the last state for consistency
+        pathProgressRef.current = 1;
+        outerAngleRef.current = localOuterAngle;
+        innerAngleRef.current = localInnerAngle;
+
+        setIsAnimating(false);
+        setPathPoints([...pathPoints]);
+  };
 
   const reset = () => {
     setIsAnimating(false);
@@ -412,5 +413,6 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     exportImage,
     handleCanvasClick,
     isAnimating,
+    instantDrawSpirograph,
   };
 }

@@ -14,14 +14,11 @@ import { useControls } from "@/hooks/useControls";
 import { useDrawing } from "@/hooks/useDrawing";
 
 export default function CreatePage() {
-  const { containerRef, canvasRef } = useCanvas();
   const {
     showCircle,
     setShowCircle,
     showPath,
     setShowPath,
-    instantDraw,
-    setInstantDraw,
     speed,
     setSpeed,
     outerCircleRadius,
@@ -40,9 +37,15 @@ export default function CreatePage() {
     setPenSize,
     lineColor,
     setLineColor,
+    setShowGrid,
+    setSnapToGrid,
+    showGrid,
+    snapToGrid,
     backgroundColor,
     setBackgroundColor,
   } = useControls();
+
+  const { containerRef, canvasRef } = useCanvas();
 
   const {
     clearSpirograph,
@@ -52,12 +55,12 @@ export default function CreatePage() {
     setPresetPath,
     toggleAnimation,
     isAnimating,
+    instantDrawSpirograph,
   } = useDrawing({
     canvasRef,
     controls: {
       showCircle,
       showPath,
-      instantDraw,
       speed,
       outerCircleRadius,
       outerPenDistance,
@@ -133,6 +136,58 @@ export default function CreatePage() {
               <h3 className="col-span-2 text-base font-semibold">
                 Playback Options
               </h3>
+              <Button
+                className="col-span-2 text-sm flex items-center gap-2"
+                type="button"
+                onClick={() => {
+                  const allOn =
+                    showCircle && showPath && showGrid && snapToGrid;
+                  setShowCircle(!allOn);
+                  setShowPath(!allOn);
+                  setShowGrid(!allOn);
+                  setSnapToGrid(!allOn);
+                }}
+              >
+                {showCircle && showPath && showGrid && snapToGrid ? (
+                  <>
+                    <span className="inline-flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                      Toggle All Off
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Toggle All On
+                    </span>
+                  </>
+                )}
+              </Button>
               <label htmlFor="show-circle" className="text-sm font-medium">
                 Show Circle
               </label>
@@ -149,30 +204,22 @@ export default function CreatePage() {
                 checked={showPath}
                 onCheckedChange={setShowPath}
               />
-              <label htmlFor="instant-draw" className="text-sm font-medium">
-                Instant Draw
+              {/* <label htmlFor="show-grid" className="text-sm font-medium">
+                Show Grid
               </label>
               <CustomSwitch
-                id="instant-draw"
-                checked={instantDraw}
-                onCheckedChange={setInstantDraw}
+                id="show-grid"
+                checked={showGrid}
+                onCheckedChange={setShowGrid}
               />
-
-              <label htmlFor="speed-slider" className="text-sm font-medium">
-                Speed
+              <label htmlFor="snap-to-grid" className="text-sm font-medium">
+                Snap to Grid
               </label>
-              <div className="flex items-center gap-2">
-                <span className="text-xs">{speed}x</span>
-                <CustomSlider
-                  id="speed-slider"
-                  min={0.5}
-                  max={3}
-                  step={0.5}
-                  value={[speed]}
-                  onValueChange={(value) => setSpeed((value as number[])[0])}
-                  style={{ flex: 1 }}
-                />
-              </div>
+              <CustomSwitch
+                id="snap-to-grid"
+                checked={snapToGrid}
+                onCheckedChange={setSnapToGrid}
+              /> */}
             </div>
 
             <hr className="my-8" />
@@ -239,45 +286,49 @@ export default function CreatePage() {
               />
               <div />
 
-              <label
-                htmlFor="inner-radius-slider"
-                className="text-sm font-medium"
-              >
-                Radius
-              </label>
-              <span className="border border-gray-300 rounded-sm text-xs p-1">
-                {innerCircleRadius}px
-              </span>
-              <CustomSlider
-                id="inner-radius-slider"
-                min={15}
-                max={outerCircleRadius / 2}
-                step={5}
-                value={[innerCircleRadius]}
-                onValueChange={(value) =>
-                  setInnerCircleRadius((value as number[])[0])
-                }
-              />
+              {innerCircleEnabled && (
+                <>
+                  <label
+                    htmlFor="inner-radius-slider"
+                    className="text-sm font-medium"
+                  >
+                    Radius
+                  </label>
+                  <span className="border border-gray-300 rounded-sm text-xs p-1">
+                    {innerCircleRadius}px
+                  </span>
+                  <CustomSlider
+                    id="inner-radius-slider"
+                    min={15}
+                    max={outerCircleRadius / 2}
+                    step={5}
+                    value={[innerCircleRadius]}
+                    onValueChange={(value) =>
+                      setInnerCircleRadius((value as number[])[0])
+                    }
+                  />
 
-              <label
-                htmlFor="inner-distance-slider"
-                className="text-sm font-medium"
-              >
-                Pen Distance
-              </label>
-              <span className="border border-gray-300 rounded-sm text-xs p-1">
-                {innerPenDistance}px
-              </span>
-              <CustomSlider
-                id="inner-distance-slider"
-                min={10}
-                max={innerCircleRadius}
-                step={5}
-                value={[innerPenDistance]}
-                onValueChange={(value) =>
-                  setInnerPenDistance((value as number[])[0])
-                }
-              />
+                  <label
+                    htmlFor="inner-distance-slider"
+                    className="text-sm font-medium"
+                  >
+                    Pen Distance
+                  </label>
+                  <span className="border border-gray-300 rounded-sm text-xs p-1">
+                    {innerPenDistance}px
+                  </span>
+                  <CustomSlider
+                    id="inner-distance-slider"
+                    min={10}
+                    max={innerCircleRadius}
+                    step={5}
+                    value={[innerPenDistance]}
+                    onValueChange={(value) =>
+                      setInnerPenDistance((value as number[])[0])
+                    }
+                  />
+                </>
+              )}
             </div>
 
             <hr className="my-8" />
@@ -288,6 +339,18 @@ export default function CreatePage() {
                 Draw Styles
               </h3>
 
+              {/* Background */}
+              <label htmlFor="background-color" className="text-sm font-medium">
+                Background
+              </label>
+              <input
+                id="background-color"
+                type="color"
+                value={backgroundColor}
+                onChange={(e) => setBackgroundColor(e.target.value)}
+                className="w-full h-8 border rounded"
+              />
+
               {/* Pen Color */}
               <label htmlFor="pen-color" className="text-sm font-medium">
                 Pen Color
@@ -297,7 +360,7 @@ export default function CreatePage() {
                 type="color"
                 value={lineColor}
                 onChange={(e) => setLineColor(e.target.value)}
-                className="w-8 h-8 border rounded"
+                className="w-full h-8 border rounded"
               />
 
               {/* Line Style */}
@@ -336,17 +399,21 @@ export default function CreatePage() {
                 </span>
               </div>
 
-              {/* Background */}
-              <label htmlFor="background-color" className="text-sm font-medium">
-                Background
+              <label htmlFor="speed-slider" className="text-sm font-medium">
+                Speed
               </label>
-              <input
-                id="background-color"
-                type="color"
-                value={backgroundColor}
-                onChange={(e) => setBackgroundColor(e.target.value)}
-                className="w-8 h-8 border rounded"
-              />
+              <div className="flex items-center gap-2">
+                <span className="text-xs">{speed}x</span>
+                <CustomSlider
+                  id="speed-slider"
+                  min={0.5}
+                  max={3}
+                  step={0.5}
+                  value={[speed]}
+                  onValueChange={(value) => setSpeed((value as number[])[0])}
+                  style={{ flex: 1 }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -356,6 +423,11 @@ export default function CreatePage() {
           <div className="absolute top-4 left-4">
             <Collapsible defaultOpen>
               <div className="flex gap-2">
+                <IconButton
+                  icon={"SkipForward"}
+                  tooltip={"Instant Draw"}
+                  onClick={instantDrawSpirograph}
+                />
                 <IconButton
                   icon={isAnimating ? "Pause" : "Play"}
                   tooltip={isAnimating ? "Pause" : "Play"}

@@ -5,7 +5,8 @@ export function useControls() {
   // Path and drawing controls
   const [showCircle, setShowCircle] = useState(true);
   const [showPath, setShowPath] = useState(true);
-  const [instantDraw, setInstantDraw] = useState(false);
+  const [showGrid, setShowGrid] = useState(false);
+  const [snapToGrid, setSnapToGrid] = useState(false);
   const [speed, setSpeed] = useState(1);
 
   // Outer circle controls
@@ -28,8 +29,6 @@ export function useControls() {
     setShowCircle,
     showPath,
     setShowPath,
-    instantDraw,
-    setInstantDraw,
     speed,
     setSpeed,
     outerCircleRadius,
@@ -48,6 +47,10 @@ export function useControls() {
     setPenSize,
     lineColor,
     setLineColor,
+    showGrid,
+    setShowGrid,
+    snapToGrid,
+    setSnapToGrid,
     backgroundColor,
     setBackgroundColor
   };
