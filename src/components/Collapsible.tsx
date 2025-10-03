@@ -21,7 +21,7 @@ export default function Collapsible({
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1 p-1 rounded border border-gray-300 bg-white hover:bg-gray-100 transition"
+        className="flex align-center justify-center gap-1 p-1 rounded-full border bg-white hover:bg-gray-100 transition"
       >
         <span
           className={`inline-block transition-transform duration-200 ${
