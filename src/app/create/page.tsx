@@ -115,7 +115,7 @@ export default function CreatePage() {
           {/* Settings */}
           <div className="overflow-auto pb-6">
             {/* Path Presets */}
-            <div className="grid grid-cols-2 gap-2 overflow-hidden">
+            <div className="grid grid-cols-2 gap-2 p-1 overflow-hidden">
               <h3 className="col-span-2 text-base font-semibold">
                 Path Presets
               </h3>

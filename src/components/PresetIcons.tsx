@@ -1,3 +1,4 @@
+import { Infinity } from "lucide-react";
 import React from "react";
 
 export function CircleIcon() {
@@ -159,4 +160,8 @@ export function MiffyIcon() {
       />
     </svg>
   );
+}
+
+export function InfinityIcon() {
+  return <Infinity size={12} />
 }

@@ -146,6 +146,22 @@ export const generatePresetPath = ({
       }
       break;
     }
+    case "infinity": {
+      // Parametric infinity (lemniscate of Gerono) curve, scaled to fit
+      // x = a * cos(t)
+      // y = a * sin(t) * cos(t)
+      const a = (maxSide / 2) - padding;
+      for (let i = 0; i < 100; i++) {
+        const t = (i / 100) * 2 * Math.PI;
+        const x = a * Math.cos(t);
+        const y = a * Math.sin(t) * Math.cos(t);
+        points.push({
+          x: centerX + x,
+          y: centerY + y,
+        });
+      }
+      break;
+    }
     case "miffy": {
       const maxMiffyWidth = width - 2 * padding;
       const maxMiffyHeight = height - 2 * padding;
