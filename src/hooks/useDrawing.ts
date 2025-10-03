@@ -49,7 +49,6 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
   /**
    * This useEffect is responsible for rendering the entire canvas whenever any relevant state changes.
    * It:
-   *  - Clears and fills the canvas with the background color.
    *  - Draws the user-defined path (if showPath is true).
    *  - Draws the spirograph trail (the animated or instant-drawn pattern).
    *  - Draws the current animation state: outer circle, outer pen, and (if enabled) inner circle and pen.
@@ -60,7 +59,7 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     const context = canvas.getContext("2d");
     if (!context) return;
     const ctx = context;
-    ctx.clearRect(0,0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Helper: Draw the user path (polygon, etc)
     function drawPath() {
@@ -200,13 +199,11 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     }
 
     // --- Main drawing routine ---
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     drawPath();
     drawSpirographTrail();
     drawAnimationState();
   }, [
+    canvasRef,
     pathPoints,
     isAnimating,
     outerCircleRadius,
@@ -217,7 +214,6 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     innerCircleRadius,
     innerPenDistance,
     lineColor,
-    backgroundColor,
     showCircle,
     showPath,
   ]);
@@ -297,44 +293,43 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
       return;
     }
     const totalSteps = 1000;
-        // Reset spirograph points for instant draw
-        // spirographPointsRef.current = [];
-        // Reset angles and progress for a clean instant draw
-        let localPathProgress = 0;
-        let localOuterAngle = outerAngleRef.current;
-        let localInnerAngle = innerAngleRef.current;
+    // Reset spirograph points for instant draw
+    // Reset angles and progress for a clean instant draw
+    let localPathProgress = 0;
+    let localOuterAngle = outerAngleRef.current;
+    let localInnerAngle = innerAngleRef.current;
 
-        for (let i = 0; i < totalSteps; i++) {
-          localPathProgress = i / totalSteps;
-          localOuterAngle += 0.1;
-          localInnerAngle += 0.15;
+    for (let i = 0; i < totalSteps; i++) {
+      localPathProgress = i / totalSteps;
+      localOuterAngle += 0.1;
+      localInnerAngle += 0.15;
 
-          const currentPos = getPointOnPath(localPathProgress, pathPoints);
-          const outerPenX =
-            currentPos.x + Math.cos(localOuterAngle) * outerPenDistance;
-          const outerPenY =
-            currentPos.y + Math.sin(localOuterAngle) * outerPenDistance;
+      const currentPos = getPointOnPath(localPathProgress, pathPoints);
+      const outerPenX =
+        currentPos.x + Math.cos(localOuterAngle) * outerPenDistance;
+      const outerPenY =
+        currentPos.y + Math.sin(localOuterAngle) * outerPenDistance;
 
-          if (innerCircleEnabled) {
-            const innerPenX =
-              outerPenX + Math.cos(localInnerAngle) * innerPenDistance;
-            const innerPenY =
-              outerPenY + Math.sin(localInnerAngle) * innerPenDistance;
-            spirographPointsRef.current.push({ x: innerPenX, y: innerPenY });
-          } else {
-            spirographPointsRef.current.push({ x: outerPenX, y: outerPenY });
-          }
-        }
-        // Update refs to match the last state for consistency
-        pathProgressRef.current = 1;
-        outerAngleRef.current = localOuterAngle;
-        innerAngleRef.current = localInnerAngle;
+      if (innerCircleEnabled) {
+        const innerPenX =
+          outerPenX + Math.cos(localInnerAngle) * innerPenDistance;
+        const innerPenY =
+          outerPenY + Math.sin(localInnerAngle) * innerPenDistance;
+        spirographPointsRef.current.push({ x: innerPenX, y: innerPenY });
+      } else {
+        spirographPointsRef.current.push({ x: outerPenX, y: outerPenY });
+      }
+    }
+    // Update refs to match the last state for consistency
+    pathProgressRef.current = 1;
+    outerAngleRef.current = localOuterAngle;
+    innerAngleRef.current = localInnerAngle;
 
-        setIsAnimating(false);
-        setPathPoints([...pathPoints]);
+    setIsAnimating(false);
+    setPathPoints([...pathPoints]);
   };
 
-  const reset = () => {
+  const clearPath = () => {
     setIsAnimating(false);
     setPathPoints([]);
     spirographPointsRef.current = [];
@@ -378,7 +373,7 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     setIsAnimating(true);
   };
 
-  const clearSpirograph = () => {
+  const clearDrawing = () => {
     spirographPointsRef.current = [];
     setPathPoints([...pathPoints]);
   };
@@ -387,9 +382,68 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // Create a temporary canvas to export only the spirograph (without UI elements)
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = canvas.width;
+    exportCanvas.height = canvas.height;
+    const exportCtx = exportCanvas.getContext("2d");
+    if (!exportCtx) return;
+
+    exportCtx.fillStyle = backgroundColor;
+    exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+    // Draw the spirograph pattern
+    if (spirographPointsRef.current.length > 0) {
+      const points = spirographPointsRef.current;
+
+      if (penStyle === "line" || penStyle === "dashes") {
+        if (penStyle === "dashes") {
+          exportCtx.setLineDash([10, 5]);
+        }
+
+        exportCtx.strokeStyle = lineColor;
+        exportCtx.lineWidth = penSize;
+        exportCtx.lineCap = "round";
+        exportCtx.lineJoin = "round";
+
+        exportCtx.beginPath();
+        exportCtx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          exportCtx.lineTo(points[i].x, points[i].y);
+        }
+        exportCtx.stroke();
+      } else if (
+        penStyle === "dots" ||
+        penStyle === "circles" ||
+        penStyle === "squares"
+      ) {
+        exportCtx.fillStyle = lineColor;
+        points.forEach((point) => {
+          if (penStyle === "dots") {
+            exportCtx.beginPath();
+            exportCtx.arc(point.x, point.y, penSize / 2, 0, Math.PI * 2);
+            exportCtx.fill();
+          } else if (penStyle === "circles") {
+            exportCtx.strokeStyle = lineColor;
+            exportCtx.lineWidth = 1;
+            exportCtx.beginPath();
+            exportCtx.arc(point.x, point.y, penSize, 0, Math.PI * 2);
+            exportCtx.stroke();
+          } else if (penStyle === "squares") {
+            exportCtx.fillRect(
+              point.x - penSize / 2,
+              point.y - penSize / 2,
+              penSize,
+              penSize
+            );
+          }
+        });
+      }
+    }
+
     const link = document.createElement("a");
     link.download = `spirograph-${Date.now()}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = exportCanvas.toDataURL("image/png");
     link.click();
   };
 
@@ -407,10 +461,10 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
   };
 
   return {
-    reset,
+    clearPath,
     setPresetPath,
     toggleAnimation,
-    clearSpirograph,
+    clearDrawing,
     exportImage,
     handleCanvasClick,
     isAnimating,

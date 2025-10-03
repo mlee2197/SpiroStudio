@@ -6,9 +6,16 @@ interface GridCanvasProps {
   type: GridType;
   gridSize: number; // renamed from 'size' to 'gridSize'
   containerRef: React.RefObject<HTMLDivElement | null>;
+  backgroundColor: string;
 }
 
-function GridCanvas({ show, type, gridSize, containerRef }: GridCanvasProps) {
+function GridCanvas({
+  show,
+  type,
+  gridSize,
+  containerRef,
+  backgroundColor,
+}: GridCanvasProps) {
   const gridCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [size, setSize] = useState<{ width: number; height: number }>({
     width: 0,
@@ -31,7 +38,6 @@ function GridCanvas({ show, type, gridSize, containerRef }: GridCanvasProps) {
   }, [containerRef]);
 
   useEffect(() => {
-    if (!show) return;
     const canvas = gridCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -39,6 +45,10 @@ function GridCanvas({ show, type, gridSize, containerRef }: GridCanvasProps) {
 
     // Clear
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (!show) return;
 
     // Draw grid based on type
     const gridSpacing = gridSize > 0 ? gridSize : 32; // use gridSize prop, fallback to 32 if invalid
@@ -66,9 +76,8 @@ function GridCanvas({ show, type, gridSize, containerRef }: GridCanvasProps) {
       }
     }
     ctx.restore();
-  }, [show, size, gridSize, type]);
+  }, [show, size, gridSize, type, backgroundColor]);
 
-  if (!show) return null;
   return (
     <canvas
       ref={gridCanvasRef}

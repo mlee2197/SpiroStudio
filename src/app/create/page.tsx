@@ -52,10 +52,10 @@ export default function CreatePage() {
   const { containerRef, canvasRef } = useCanvas();
 
   const {
-    clearSpirograph,
+    clearDrawing,
     exportImage,
     handleCanvasClick,
-    reset,
+    clearPath,
     setPresetPath,
     toggleAnimation,
     isAnimating,
@@ -461,21 +461,21 @@ export default function CreatePage() {
 
         {/* Canvas */}
         <div ref={containerRef} className="relative w-full flex-grow">
-          <canvas
-            ref={canvasRef}
-            // width={800}
-            // height={600}
-            className="relative w-full border border-border rounded-lg cursor-crosshair"
-            style={{ backgroundColor }}
-            onClick={handleCanvasClick}
-          />
           <GridCanvas
             show={showGrid.enabled}
             type={showGrid.type}
             gridSize={gridSize}
             containerRef={containerRef}
+            backgroundColor={backgroundColor}
           />
-          <div className="absolute top-4 left-4 z-10">
+          <canvas
+            ref={canvasRef}
+            // width={800}
+            // height={600}
+            className="relative w-full border border-border rounded-lg cursor-crosshair bg-transparent"
+            onClick={handleCanvasClick}
+          />
+          <div className="absolute top-4 left-4">
             <Collapsible defaultOpen>
               <div className="flex gap-2">
                 <IconButton
@@ -491,16 +491,16 @@ export default function CreatePage() {
                   bgColor="white"
                 />
                 <IconButton
-                  icon="Eraser"
+                  icon="LineSquiggle"
                   tooltip="Clear Drawing"
-                  onClick={clearSpirograph}
-                  bgColor="white"
+                  onClick={clearDrawing}
+                  bgColor="#ecc1c1"
                 />
                 <IconButton
-                  icon="RefreshCcw"
-                  tooltip="Reset all"
+                  icon="Waypoints"
+                  tooltip="Clear Path"
                   bgColor="#ecc1c1"
-                  onClick={reset}
+                  onClick={clearPath}
                 />
                 <IconButton
                   icon="Download"
