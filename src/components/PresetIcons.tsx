@@ -105,3 +105,58 @@ export function SpiralIcon() {
     </svg>
   );
 }
+
+export function HeartIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M8 14
+           C8 14, 2 10, 2 6.5
+           C2 4, 4 2, 6.5 3.5
+           C8 4.5, 9.5 3.5, 11.5 3.5
+           C14 4, 14 7, 14 6.5
+           C14 10, 8 14, 8 14Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+export function MiffyIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      {/* Head */}
+      <ellipse
+        cx="8"
+        cy="9"
+        rx="3.5"
+        ry="4.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        fill="none"
+      />
+      {/* Left ear */}
+      <ellipse
+        cx="5.5"
+        cy="3.5"
+        rx="1"
+        ry="2.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        fill="none"
+      />
+      {/* Right ear */}
+      <ellipse
+        cx="10.5"
+        cy="3.5"
+        rx="1"
+        ry="2.5"
+        stroke="currentColor"
+        strokeWidth="2"
+        fill="none"
+      />
+    </svg>
+  );
+}

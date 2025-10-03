@@ -128,6 +128,85 @@ export const generatePresetPath = ({
       }
       break;
     }
+    case "heart": {
+      // Parametric heart curve, scaled to fit
+      const scale = maxSide / 32;
+      for (let i = 0; i < 100; i++) {
+        const t = (i / 100) * Math.PI * 2;
+        const x = 16 * Math.pow(Math.sin(t), 3);
+        const y =
+          13 * Math.cos(t) -
+          5 * Math.cos(2 * t) -
+          2 * Math.cos(3 * t) -
+          Math.cos(4 * t);
+        points.push({
+          x: centerX + x * scale,
+          y: centerY - y * scale, // minus because canvas y increases downward
+        });
+      }
+      break;
+    }
+    case "miffy": {
+      const scale = maxSide / 10;
+
+      const outline = [
+        // Start bottom center
+        { x: centerX, y: centerY + scale },
+
+        // Left cheek
+        { x: centerX - 0.8 * scale, y: centerY + 0.8 * scale },
+        { x: centerX - 1.0 * scale, y: centerY + 0.3 * scale },
+        { x: centerX - 0.9 * scale, y: centerY - 0.2 * scale },
+
+        // Base of left ear
+        { x: centerX - 0.6 * scale, y: centerY - 0.6 * scale },
+
+        // Left ear (outer curve, round)
+        { x: centerX - 0.7 * scale, y: centerY - 1.1 * scale },
+        { x: centerX - 0.75 * scale, y: centerY - 1.6 * scale },
+        { x: centerX - 0.65 * scale, y: centerY - 1.9 * scale },
+        { x: centerX - 0.6 * scale, y: centerY - 2.05 * scale },
+        { x: centerX - 0.45 * scale, y: centerY - 2.15 * scale },
+        { x: centerX - 0.3 * scale, y: centerY - 2.1 * scale },
+
+        // Left ear (inner curve, rounder)
+        { x: centerX - 0.20 * scale, y: centerY - 1.95 * scale },
+        { x: centerX - 0.16 * scale, y: centerY - 1.7 * scale },
+        { x: centerX - 0.18 * scale, y: centerY - 1.3 * scale },
+
+        // Gap between ears (unchanged)
+        { x: centerX - 0.2 * scale, y: centerY - 0.7 * scale },
+        { x: centerX, y: centerY - 0.72 * scale },
+        { x: centerX + 0.2 * scale, y: centerY - 0.7 * scale },
+
+        // Right ear (inner curve, rounder) -- MIRRORED from left
+        { x: centerX + 0.18 * scale, y: centerY - 1.3 * scale },
+        { x: centerX + 0.16 * scale, y: centerY - 1.7 * scale },
+        { x: centerX + 0.20 * scale, y: centerY - 1.95 * scale },
+
+        // Right ear (outer curve, round) -- MIRRORED from left
+        { x: centerX + 0.3 * scale, y: centerY - 2.1 * scale },
+        { x: centerX + 0.45 * scale, y: centerY - 2.15 * scale },
+        { x: centerX + 0.6 * scale, y: centerY - 2.05 * scale },
+        { x: centerX + 0.65 * scale, y: centerY - 1.9 * scale },
+        { x: centerX + 0.75 * scale, y: centerY - 1.6 * scale },
+        { x: centerX + 0.7 * scale, y: centerY - 1.1 * scale },
+
+        // Base of right ear
+        { x: centerX + 0.6 * scale, y: centerY - 0.6 * scale },
+
+        // Right cheek
+        { x: centerX + 0.9 * scale, y: centerY - 0.2 * scale },
+        { x: centerX + 1.0 * scale, y: centerY + 0.3 * scale },
+        { x: centerX + 0.8 * scale, y: centerY + 0.8 * scale },
+
+        // Back to bottom
+        { x: centerX, y: centerY + scale },
+      ];
+
+      points.push(...outline);
+      break;
+    }
   }
 
   return points;

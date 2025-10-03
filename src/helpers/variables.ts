@@ -7,6 +7,8 @@ import {
   SpiralIcon,
   SquareIcon,
   StarIcon,
+  HeartIcon,
+  MiffyIcon
 } from "../components/PresetIcons";
 
 export const PRESET_BUTTONS: {
@@ -19,8 +21,10 @@ export const PRESET_BUTTONS: {
   { preset: "square", label: "Square", icon: SquareIcon },
   { preset: "polygon", label: "Polygon", icon: PolygonIcon },
   { preset: "star", label: "Star", icon: StarIcon },
+  { preset: "heart", label: "Heart", icon: HeartIcon },
   { preset: "sine", label: "Sine Wave", icon: SineIcon },
   { preset: "spiral", label: "Spiral", icon: SpiralIcon },
+  { preset: "miffy", label: "Miffy", icon: MiffyIcon },
 ];
 
 export const INSTRUCTIONS = [
