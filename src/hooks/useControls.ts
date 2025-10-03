@@ -7,7 +7,7 @@ export function useControls() {
   const [showPath, setShowPath] = useState(true);
   const [showGrid, setShowGrid] = useState({
     enabled: false,
-    type: "columns" as GridType
+    type: "grid" as GridType
   });
   const [gridSize, setGridSize] = useState(32);
   const [snapToGrid, setSnapToGrid] = useState(false);

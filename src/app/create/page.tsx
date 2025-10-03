@@ -55,7 +55,7 @@ export default function CreatePage() {
     clearDrawing,
     exportImage,
     handleCanvasClick,
-    clearPath,
+    resetAll,
     setPresetPath,
     toggleAnimation,
     isAnimating,
@@ -75,6 +75,9 @@ export default function CreatePage() {
       penSize,
       lineColor,
       backgroundColor,
+      snapToGrid,
+      gridSize,
+      gridType: showGrid.type,
     },
   });
 
@@ -89,11 +92,11 @@ export default function CreatePage() {
           SpiroStudio
         </Link>
       </div>
-      <div className="flex flex-col-reverse items-center justify-center h-[calc(100%-57px)] w-full md:pr-4 md:flex-row">
+      <div className="flex flex-col-reverse items-center justify-center h-[calc(100%-57px)] w-full md:flex-row">
         {/* Controls */}
-        <div className="grid grid-rows-[40px_1fr] gap-4 w-full max-w-[360px] h-full p-4">
+        <div className="grid grid-rows-[40px_1fr] gap-4 w-full max-w-[360px] h-full">
           {/* Top Buttons */}
-          <div className="w-full flex items-center justify-between mb-4">
+          <div className="w-full flex items-center justify-between p-2 pt-6">
             <h2 className="text-xl font-semibold">Controls</h2>
             <CustomPopover
               title="How to use"
@@ -117,7 +120,7 @@ export default function CreatePage() {
           </div>
 
           {/* Settings */}
-          <div className="overflow-auto pb-6">
+          <div className="overflow-auto p-2 pb-6">
             {/* Path Presets */}
             <div className="grid grid-cols-2 gap-2 p-1 overflow-hidden">
               <h3 className="col-span-2 text-base text-secondary">
@@ -133,10 +136,10 @@ export default function CreatePage() {
               ))}
             </div>
 
-            <hr className="my-8" />
+            <hr className="my-4" />
 
             {/* Display Options */}
-            <div className="grid grid-cols-[40%_60%] items-center gap-4 overflow-hidden">
+            <div className="grid grid-cols-[40%_60%] items-center gap-4 p-4 overflow-hidden">
               <h3 className="col-span-2 text-base text-secondary">
                 Display Options
               </h3>
@@ -150,7 +153,7 @@ export default function CreatePage() {
                   setShowPath(!allOn);
                   setShowGrid({
                     enabled: !allOn,
-                    type: "columns",
+                    type: "grid",
                   });
                   setSnapToGrid(!allOn);
                 }}
@@ -221,6 +224,14 @@ export default function CreatePage() {
                   setShowGrid((prev) => ({ enabled: value, type: prev.type }))
                 }
               />
+              <label htmlFor="snap-to-grid" className="text-sm font-medium">
+                Snap to Grid
+              </label>
+              <CustomSwitch
+                id="snap-to-grid"
+                checked={snapToGrid}
+                onCheckedChange={setSnapToGrid}
+              />
               {showGrid.enabled && (
                 <>
                   {/* Grid Type */}
@@ -263,20 +274,12 @@ export default function CreatePage() {
                   />
                 </>
               )}
-              {/* <label htmlFor="snap-to-grid" className="text-sm font-medium">
-                Snap to Grid
-              </label>
-              <CustomSwitch
-                id="snap-to-grid"
-                checked={snapToGrid}
-                onCheckedChange={setSnapToGrid}
-              /> */}
             </div>
 
-            <hr className="my-8" />
+            <hr className="my-4" />
 
             {/* Circle Config */}
-            <div className="grid grid-cols-2 items-center gap-4 overflow-hidden">
+            <div className="grid grid-cols-2 items-center gap-4 p-4 overflow-hidden">
               <h3 className="col-span-2 text-base text-secondary">
                 Circle Configuration
               </h3>
@@ -373,10 +376,10 @@ export default function CreatePage() {
               )}
             </div>
 
-            <hr className="my-8" />
+            <hr className="my-4" />
 
             {/* Draw Styles */}
-            <div className="grid grid-cols-2 gap-4 items-center overflow-hidden">
+            <div className="grid grid-cols-2 gap-4 items-center p-4 overflow-hidden">
               <h3 className="col-span-2 text-base text-secondary">
                 Draw Styles
               </h3>
@@ -497,10 +500,10 @@ export default function CreatePage() {
                   bgColor="#ecc1c1"
                 />
                 <IconButton
-                  icon="Waypoints"
-                  tooltip="Clear Path"
+                  icon="RefreshCcw"
+                  tooltip="Clear All"
                   bgColor="#ecc1c1"
-                  onClick={clearPath}
+                  onClick={resetAll}
                 />
                 <IconButton
                   icon="Download"

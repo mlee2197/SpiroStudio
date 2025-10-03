@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import type { PathPreset, Point } from "@/types";
+import type { GridType, PathPreset, Point } from "@/types";
 import { generatePresetPath, getPointOnPath } from "@/helpers/CanvasUtils";
 
 interface UseDrawingProps {
@@ -17,6 +17,9 @@ interface UseDrawingProps {
     innerPenDistance: number;
     lineColor: string;
     backgroundColor: string;
+    gridSize: number;
+    snapToGrid: boolean;
+    gridType: GridType;
   };
 }
 
@@ -44,6 +47,9 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     innerPenDistance,
     lineColor,
     backgroundColor,
+    gridSize,
+    snapToGrid,
+    gridType,
   } = controls;
 
   /**
@@ -329,7 +335,7 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     setPathPoints([...pathPoints]);
   };
 
-  const clearPath = () => {
+  const resetAll = () => {
     setIsAnimating(false);
     setPathPoints([]);
     spirographPointsRef.current = [];
@@ -454,14 +460,28 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    if (snapToGrid) {
+      if (gridType === "grid") {
+        // Snap both x and y to nearest grid intersection
+        x = Math.round(x / gridSize) * gridSize;
+        y = Math.round(y / gridSize) * gridSize;
+      } else if (gridType === "columns") {
+        // Snap x to nearest column, y remains free
+        x = Math.round(x / gridSize) * gridSize;
+      } else if (gridType === "rows") {
+        // Snap y to nearest row, x remains free
+        y = Math.round(y / gridSize) * gridSize;
+      }
+    }
 
     setPathPoints([...pathPoints, { x, y }]);
   };
 
   return {
-    clearPath,
+    resetAll,
     setPresetPath,
     toggleAnimation,
     clearDrawing,
