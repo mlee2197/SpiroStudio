@@ -16,7 +16,7 @@ export const generatePresetPath = ({
   const points: Point[] = [];
   // Padding to keep shapes away from the edge
   const padding = 64;
-  // Use the smallest side minus padding for max size
+  // Use the smallest side minus padding for max size for other shapes
   const maxSide = Math.min(width, height) - 2 * padding;
 
   switch (preset) {
@@ -147,61 +147,64 @@ export const generatePresetPath = ({
       break;
     }
     case "miffy": {
-      const scale = maxSide / 10;
+      const maxMiffyWidth = width - 2 * padding;
+      const maxMiffyHeight = height - 2 * padding;
+      const miffyBaseWidth = 3.0;
+      const miffyBaseHeight = 4.15;
+      const scale = Math.min(maxMiffyWidth / miffyBaseWidth, maxMiffyHeight / miffyBaseHeight);
 
-      const outline = [
+      // Move all points down by a bit (e.g., 0.3 * scale)
+      const yOffset = 0.3 * scale;
+
+      // Define the left side of the outline (from bottom center up the left, to the top of the left ear)
+      const leftOutline = [
         // Start bottom center
-        { x: centerX, y: centerY + scale },
+        { x: centerX, y: centerY + scale + yOffset },
 
         // Left cheek
-        { x: centerX - 0.8 * scale, y: centerY + 0.8 * scale },
-        { x: centerX - 1.0 * scale, y: centerY + 0.3 * scale },
-        { x: centerX - 0.9 * scale, y: centerY - 0.2 * scale },
+        { x: centerX - 0.4 * scale, y: centerY + 0.95 * scale + yOffset },
+        { x: centerX - 0.7 * scale, y: centerY + 0.8 * scale + yOffset },
+        { x: centerX - 0.92 * scale, y: centerY + 0.6 * scale + yOffset },
+        { x: centerX - 0.98 * scale, y: centerY + 0.3 * scale + yOffset },
+        { x: centerX - 0.99 * scale, y: centerY + 0.05 * scale + yOffset },
+        { x: centerX - 0.94 * scale, y: centerY - 0.2 * scale + yOffset },
+        { x: centerX - 0.85 * scale, y: centerY - 0.4 * scale + yOffset },
 
         // Base of left ear
-        { x: centerX - 0.6 * scale, y: centerY - 0.6 * scale },
+        { x: centerX - 0.6 * scale, y: centerY - 0.6 * scale + yOffset },
 
         // Left ear (outer curve, round)
-        { x: centerX - 0.7 * scale, y: centerY - 1.1 * scale },
-        { x: centerX - 0.75 * scale, y: centerY - 1.6 * scale },
-        { x: centerX - 0.65 * scale, y: centerY - 1.9 * scale },
-        { x: centerX - 0.6 * scale, y: centerY - 2.05 * scale },
-        { x: centerX - 0.45 * scale, y: centerY - 2.15 * scale },
-        { x: centerX - 0.3 * scale, y: centerY - 2.1 * scale },
+        { x: centerX - 0.7 * scale, y: centerY - 1.1 * scale + yOffset },
+        { x: centerX - 0.71 * scale, y: centerY - 1.6 * scale + yOffset },
+        { x: centerX - 0.65 * scale, y: centerY - 1.9 * scale + yOffset },
+        { x: centerX - 0.6 * scale, y: centerY - 2.05 * scale + yOffset },
+        { x: centerX - 0.45 * scale, y: centerY - 2.15 * scale + yOffset },
+        { x: centerX - 0.3 * scale, y: centerY - 2.1 * scale + yOffset },
 
         // Left ear (inner curve, rounder)
-        { x: centerX - 0.20 * scale, y: centerY - 1.95 * scale },
-        { x: centerX - 0.16 * scale, y: centerY - 1.7 * scale },
-        { x: centerX - 0.18 * scale, y: centerY - 1.3 * scale },
+        { x: centerX - 0.20 * scale, y: centerY - 1.95 * scale + yOffset },
+        { x: centerX - 0.16 * scale, y: centerY - 1.7 * scale + yOffset },
+        { x: centerX - 0.18 * scale, y: centerY - 1.3 * scale + yOffset },
 
         // Gap between ears (unchanged)
-        { x: centerX - 0.2 * scale, y: centerY - 0.7 * scale },
-        { x: centerX, y: centerY - 0.72 * scale },
-        { x: centerX + 0.2 * scale, y: centerY - 0.7 * scale },
+        { x: centerX - 0.2 * scale, y: centerY - 0.7 * scale + yOffset },
+        { x: centerX, y: centerY - 0.72 * scale + yOffset },
+      ];
 
-        // Right ear (inner curve, rounder) -- MIRRORED from left
-        { x: centerX + 0.18 * scale, y: centerY - 1.3 * scale },
-        { x: centerX + 0.16 * scale, y: centerY - 1.7 * scale },
-        { x: centerX + 0.20 * scale, y: centerY - 1.95 * scale },
+      // Mirror the left side to create the right side (excluding the bottom center and center gap)
+      // For each point (except the first and last), mirror across the vertical center
+      const rightOutline = leftOutline
+        .slice(1, -1)
+        .map(pt => ({
+          x: centerX + (centerX - pt.x),
+          y: pt.y
+        }))
+        .reverse();
 
-        // Right ear (outer curve, round) -- MIRRORED from left
-        { x: centerX + 0.3 * scale, y: centerY - 2.1 * scale },
-        { x: centerX + 0.45 * scale, y: centerY - 2.15 * scale },
-        { x: centerX + 0.6 * scale, y: centerY - 2.05 * scale },
-        { x: centerX + 0.65 * scale, y: centerY - 1.9 * scale },
-        { x: centerX + 0.75 * scale, y: centerY - 1.6 * scale },
-        { x: centerX + 0.7 * scale, y: centerY - 1.1 * scale },
-
-        // Base of right ear
-        { x: centerX + 0.6 * scale, y: centerY - 0.6 * scale },
-
-        // Right cheek
-        { x: centerX + 0.9 * scale, y: centerY - 0.2 * scale },
-        { x: centerX + 1.0 * scale, y: centerY + 0.3 * scale },
-        { x: centerX + 0.8 * scale, y: centerY + 0.8 * scale },
-
-        // Back to bottom
-        { x: centerX, y: centerY + scale },
+      const outline = [
+        ...leftOutline,
+        ...rightOutline,
+        { x: centerX, y: centerY + scale + yOffset }, // Close the path at the bottom center
       ];
 
       points.push(...outline);

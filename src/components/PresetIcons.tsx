@@ -131,8 +131,8 @@ export function MiffyIcon() {
       <ellipse
         cx="8"
         cy="9"
-        rx="3.5"
-        ry="4.5"
+        rx="4"
+        ry="3.5"
         stroke="currentColor"
         strokeWidth="2"
         fill="none"
