@@ -1,6 +1,6 @@
 "use client";
 
-import { PenStyle } from "@/types";
+import { GridType, PenStyle } from "@/types";
 import Link from "next/link";
 import { useCanvas } from "@/hooks/useCanvas";
 import Collapsible from "@/components/Collapsible";
@@ -13,6 +13,7 @@ import CustomPopover from "@/components/Popover";
 import { useControls } from "@/hooks/useControls";
 import { useDrawing } from "@/hooks/useDrawing";
 import GridCanvas from "@/components/GridCanvas";
+import CustomTabs from "@/components/Tabs";
 
 export default function CreatePage() {
   const {
@@ -147,7 +148,10 @@ export default function CreatePage() {
                     showCircle && showPath && showGrid && snapToGrid;
                   setShowCircle(!allOn);
                   setShowPath(!allOn);
-                  setShowGrid(!allOn);
+                  setShowGrid({
+                    enabled: !allOn,
+                    type: "columns",
+                  });
                   setSnapToGrid(!allOn);
                 }}
               >
@@ -212,11 +216,33 @@ export default function CreatePage() {
               </label>
               <CustomSwitch
                 id="show-grid"
-                checked={showGrid}
-                onCheckedChange={setShowGrid}
+                checked={showGrid.enabled}
+                onCheckedChange={(value) =>
+                  setShowGrid((prev) => ({ enabled: value, type: prev.type }))
+                }
               />
-              {showGrid && (
+              {showGrid.enabled && (
                 <>
+                  {/* Grid Type */}
+                  <label htmlFor="show-grid" className="text-sm font-medium">
+                    Grid Type
+                  </label>
+                  <CustomTabs
+                    items={[
+                      { label: "Grid", value: "grid" },
+                      { label: "Columns", value: "columns" },
+                      { label: "Rows", value: "rows" },
+                    ]}
+                    value={showGrid.type}
+                    onChange={(value) =>
+                      setShowGrid((prev) => ({
+                        enabled: prev.enabled,
+                        type: value as GridType,
+                      }))
+                    }
+                  />
+
+                  {/* Grid Size */}
                   <label
                     htmlFor="grid-size-slider"
                     className="text-sm font-medium"
@@ -443,7 +469,12 @@ export default function CreatePage() {
             style={{ backgroundColor }}
             onClick={handleCanvasClick}
           />
-          <GridCanvas show={showGrid} gridSize={gridSize} containerRef={containerRef} />
+          <GridCanvas
+            show={showGrid.enabled}
+            type={showGrid.type}
+            gridSize={gridSize}
+            containerRef={containerRef}
+          />
           <div className="absolute top-4 left-4 z-10">
             <Collapsible defaultOpen>
               <div className="flex gap-2">

@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { PenStyle } from "@/types";
+import { GridType, PenStyle } from "@/types";
 
 export function useControls() {
   // Path and drawing controls
   const [showCircle, setShowCircle] = useState(true);
   const [showPath, setShowPath] = useState(true);
-  const [showGrid, setShowGrid] = useState(false);
+  const [showGrid, setShowGrid] = useState({
+    enabled: false,
+    type: "columns" as GridType
+  });
   const [gridSize, setGridSize] = useState(32);
   const [snapToGrid, setSnapToGrid] = useState(false);
   const [speed, setSpeed] = useState(1);
