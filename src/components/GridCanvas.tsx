@@ -1,4 +1,4 @@
-import { ColorType, GridType } from "@/types";
+import { GridType } from "@/types";
 import React, { useRef, useEffect, useState } from "react";
 
 interface GridCanvasProps {
@@ -7,7 +7,7 @@ interface GridCanvasProps {
   type: GridType;
   gridSize: number; // renamed from 'size' to 'gridSize'
   containerRef: React.RefObject<HTMLDivElement | null>;
-  backgroundColor: ColorType;
+  backgroundColor: string;
 }
 
 function GridCanvas({
@@ -76,7 +76,7 @@ function GridCanvas({
 
     // Clear
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = backgroundColor.hex;
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (showGrid) {

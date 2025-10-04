@@ -1,4 +1,5 @@
 import { PathPreset, Point } from "@/types";
+import { RGBColor } from "react-color";
 
 export const generatePresetPath = ({
   preset,
@@ -273,8 +274,8 @@ export const getPointOnPath = (
 };
 
 export function getGradientColorRGBA(
-  startRgba: { r: number; g: number; b: number; a?: number },
-  endRgba: { r: number; g: number; b: number; a?: number },
+  startRgba: RGBColor,
+  endRgba: RGBColor,
   progress: number
 ): string {
   // Clamp progress between 0 and 1

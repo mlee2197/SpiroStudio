@@ -43,8 +43,6 @@ export default function CreatePage() {
     setPenSize,
     lineColor,
     setLineColor,
-    lineColor2,
-    setLineColor2,
     setShowGrid,
     setSnapToGrid,
     showGrid,
@@ -81,7 +79,6 @@ export default function CreatePage() {
       penStyle,
       penSize,
       lineColor,
-      lineColor2,
       backgroundColor,
       snapToGrid,
       gridSize,
@@ -199,7 +196,7 @@ export default function CreatePage() {
                 </>
               )}
             </Button>
-            <label htmlFor="show-circle" className="text-sm font-medium">
+            <label htmlFor="show-circle" className="control-label">
               Show Circle
             </label>
             <CustomSwitch
@@ -207,7 +204,7 @@ export default function CreatePage() {
               checked={showCircle}
               onCheckedChange={setShowCircle}
             />
-            <label htmlFor="show-path" className="text-sm font-medium">
+            <label htmlFor="show-path" className="control-label">
               Show Path
             </label>
             <CustomSwitch
@@ -215,7 +212,7 @@ export default function CreatePage() {
               checked={showPath}
               onCheckedChange={setShowPath}
             />
-            <label htmlFor="show-grid" className="text-sm font-medium">
+            <label htmlFor="show-grid" className="control-label">
               Show Grid
             </label>
             <CustomSwitch
@@ -225,7 +222,7 @@ export default function CreatePage() {
                 setShowGrid((prev) => ({ enabled: value, type: prev.type }))
               }
             />
-            <label htmlFor="snap-to-grid" className="text-sm font-medium">
+            <label htmlFor="snap-to-grid" className="control-label">
               Snap to Grid
             </label>
             <CustomSwitch
@@ -236,9 +233,7 @@ export default function CreatePage() {
             {(showGrid.enabled || snapToGrid) && (
               <>
                 {/* Grid Type */}
-                <label className="text-sm font-medium">
-                  Grid Type
-                </label>
+                <label className="control-label">Grid Type</label>
                 <CustomTabs
                   items={[
                     { label: "Grid", value: "grid" },
@@ -257,7 +252,7 @@ export default function CreatePage() {
                 {/* Grid Size */}
                 <label
                   htmlFor="grid-size-slider"
-                  className="text-sm font-medium"
+                  className="control-label"
                 >
                   Grid Size
                 </label>
@@ -282,7 +277,7 @@ export default function CreatePage() {
 
             <label
               htmlFor="outer-radius-slider"
-              className="text-sm font-medium"
+              className="control-label"
             >
               Radius
             </label>
@@ -300,7 +295,7 @@ export default function CreatePage() {
 
             <label
               htmlFor="inner-distance-slider"
-              className="text-sm font-medium"
+              className="control-label"
             >
               Pen Distance
             </label>
@@ -334,7 +329,7 @@ export default function CreatePage() {
               <>
                 <label
                   htmlFor="inner-radius-slider"
-                  className="text-sm font-medium"
+                  className="control-label"
                 >
                   Radius
                 </label>
@@ -352,7 +347,7 @@ export default function CreatePage() {
 
                 <label
                   htmlFor="inner-distance-slider"
-                  className="text-sm font-medium"
+                  className="control-label"
                 >
                   Pen Distance
                 </label>
@@ -375,25 +370,31 @@ export default function CreatePage() {
             <h3 className="control-section-header">Draw Styles</h3>
 
             {/* Background */}
-            <label htmlFor="background-color" className="text-sm font-medium">
+            <label htmlFor="background-color" className="control-label">
               Background
             </label>
             <ColorPicker
+              id="background-color"
               value={backgroundColor}
               setValue={setBackgroundColor}
             />
 
             {/* Pen Color */}
-            <label htmlFor="pen-color" className="text-sm font-medium">
+            <label htmlFor="pen-color" className="control-label">
               Pen Color
             </label>
             <ColorPicker
+              id="pen-color"
               value={lineColor}
               setValue={setLineColor}
             />
+            {/* Gradient Color 2 */}
+            <label htmlFor="enable-gradient" className="control-label">
+              Enable Gradient
+            </label>
 
             {/* Line Style */}
-            <label htmlFor="line-style" className="text-sm font-medium">
+            <label htmlFor="line-style" className="control-label">
               Line Style
             </label>
             <select
@@ -410,7 +411,7 @@ export default function CreatePage() {
             </select>
 
             {/* Pen Size */}
-            <label htmlFor="pen-size" className="text-sm font-medium">
+            <label htmlFor="pen-size" className="control-label">
               Size
             </label>
             <CustomSlider
@@ -424,7 +425,7 @@ export default function CreatePage() {
               style={{ width: 100 }}
             />
 
-            <label htmlFor="speed-slider" className="text-sm font-medium">
+            <label htmlFor="speed-slider" className="control-label">
               Speed
             </label>
             <CustomSlider

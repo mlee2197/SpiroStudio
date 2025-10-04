@@ -1,27 +1,34 @@
-import * as React from 'react';
-import { Popover } from '@base-ui-components/react/popover';
-import styles from './Popover.module.css';
+import * as React from "react";
+import { Popover } from "@base-ui-components/react/popover";
+import styles from "./Popover.module.css";
 
 interface CustomPopoverProps {
+  id?: string;
   children: React.ReactNode;
   trigger: React.ReactNode;
   title?: React.ReactNode;
   popupClassName?: string;
 }
 
-export default function CustomPopover({ children, trigger, title, popupClassName }: CustomPopoverProps) {
+export default function CustomPopover({
+  id,
+  children,
+  trigger,
+  title,
+  popupClassName,
+}: CustomPopoverProps) {
   return (
     <Popover.Root>
-      <Popover.Trigger>
-        {trigger}
-      </Popover.Trigger>
+      <Popover.Trigger id={id}>{trigger}</Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner sideOffset={8}>
           <Popover.Popup className={popupClassName}>
             <Popover.Arrow className={styles.Arrow}>
               <ArrowSvg />
             </Popover.Arrow>
-            {title && <Popover.Title className={styles.Title}>{title}</Popover.Title>}
+            {title && (
+              <Popover.Title className={styles.Title}>{title}</Popover.Title>
+            )}
             {children}
           </Popover.Popup>
         </Popover.Positioner>
@@ -30,7 +37,7 @@ export default function CustomPopover({ children, trigger, title, popupClassName
   );
 }
 
-function ArrowSvg(props: React.ComponentProps<'svg'>) {
+function ArrowSvg(props: React.ComponentProps<"svg">) {
   return (
     <svg width="20" height="10" viewBox="0 0 20 10" fill="none" {...props}>
       <path

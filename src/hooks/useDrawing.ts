@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import type { ColorType, GridType, PathPreset, Point } from "@/types";
+import type { GridType, PathPreset, Point } from "@/types";
 import { generatePresetPath, getPointOnPath } from "@/helpers/CanvasUtils";
 
 interface UseDrawingProps {
@@ -16,9 +16,8 @@ interface UseDrawingProps {
     innerCircleEnabled: boolean;
     innerCircleRadius: number;
     innerPenDistance: number;
-    lineColor: ColorType;
-    lineColor2: ColorType;
-    backgroundColor: ColorType;
+    lineColor: string;
+    backgroundColor: string;
     gridSize: number;
     snapToGrid: boolean;
     gridType: GridType;
@@ -48,7 +47,6 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     innerCircleRadius,
     innerPenDistance,
     lineColor,
-    lineColor2,
     backgroundColor,
     gridSize,
     snapToGrid,
@@ -104,7 +102,7 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
       ctx.save();
       if (penStyle === "line" || penStyle === "dashes") {
         if (penStyle === "dashes") ctx.setLineDash([10, 5]);
-        ctx.strokeStyle = lineColor.hex;
+        ctx.strokeStyle = lineColor;
         ctx.lineWidth = penSize;
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
@@ -122,18 +120,18 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
       ) {
         points.forEach((point) => {
           if (penStyle === "dots") {
-            ctx.fillStyle = lineColor.hex;
+            ctx.fillStyle = lineColor;
             ctx.beginPath();
             ctx.arc(point.x, point.y, penSize / 2, 0, Math.PI * 2);
             ctx.fill();
           } else if (penStyle === "circles") {
-            ctx.strokeStyle = lineColor.hex;
+            ctx.strokeStyle = lineColor;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.arc(point.x, point.y, penSize, 0, Math.PI * 2);
             ctx.stroke();
           } else if (penStyle === "squares") {
-            ctx.fillStyle = lineColor.hex;
+            ctx.fillStyle = lineColor;
             ctx.fillRect(
               point.x - penSize / 2,
               point.y - penSize / 2,
@@ -403,7 +401,7 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     const exportCtx = exportCanvas.getContext("2d");
     if (!exportCtx) return;
 
-    exportCtx.fillStyle = backgroundColor.hex;
+    exportCtx.fillStyle = backgroundColor;
     exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
     // Draw the spirograph pattern
@@ -415,7 +413,7 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
           exportCtx.setLineDash([10, 5]);
         }
 
-        exportCtx.strokeStyle = lineColor.hex;
+        exportCtx.strokeStyle = lineColor;
         exportCtx.lineWidth = penSize;
         exportCtx.lineCap = "round";
         exportCtx.lineJoin = "round";
@@ -431,14 +429,14 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
         penStyle === "circles" ||
         penStyle === "squares"
       ) {
-        exportCtx.fillStyle = lineColor.hex;
+        exportCtx.fillStyle = lineColor;
         points.forEach((point) => {
           if (penStyle === "dots") {
             exportCtx.beginPath();
             exportCtx.arc(point.x, point.y, penSize / 2, 0, Math.PI * 2);
             exportCtx.fill();
           } else if (penStyle === "circles") {
-            exportCtx.strokeStyle = lineColor.hex;
+            exportCtx.strokeStyle = lineColor;
             exportCtx.lineWidth = 1;
             exportCtx.beginPath();
             exportCtx.arc(point.x, point.y, penSize, 0, Math.PI * 2);

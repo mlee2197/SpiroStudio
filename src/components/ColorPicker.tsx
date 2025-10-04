@@ -1,12 +1,12 @@
 "use client";
-import { ColorType } from "@/types";
 import React, { useState, useEffect } from "react";
 import { SketchPicker, ColorResult } from "react-color";
 import CustomPopover from "./Popover";
 
 type ColorPickerProps = {
-  value: ColorType;
-  setValue: (color: ColorType) => void;
+  id?: string;
+  value: string;
+  setValue: (color: string) => void;
 };
 
 const LOCAL_STORAGE_KEY = "colorPickerHistory";
@@ -26,7 +26,7 @@ const defaultPresetColors = [
 
 const MAX_PRESET_COLORS = 16;
 
-const ColorPicker: React.FC<ColorPickerProps> = ({ value, setValue }) => {
+const ColorPicker: React.FC<ColorPickerProps> = ({ value, setValue, id }) => {
   const [presetColors, setPresetColors] = useState<string[]>(
     defaultPresetColors.slice(0, MAX_PRESET_COLORS)
   );
@@ -51,7 +51,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ value, setValue }) => {
   }, []);
 
   const handleChange = (color: ColorResult) => {
-    setValue({ hex: color.hex, rgb: color.rgb });
+    setValue(color.hex);
   };
 
   // save color to history
@@ -83,16 +83,17 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ value, setValue }) => {
 
   return (
     <CustomPopover
+      id={id}
       trigger={
         <div
-          className="w-8 h-8 rounded border border-gray-300 cursor-pointer flex items-center justify-center"
-          style={{ background: value.hex }}
+          className="w-full h-8 rounded border border-gray-300 cursor-pointer flex items-center justify-center"
+          style={{ background: value }}
           aria-label="Pick color"
         />
       }
     >
       <SketchPicker
-        color={value.hex}
+        color={value}
         onChange={handleChange}
         onChangeComplete={handleChangeComplete}
         presetColors={presetColors}

@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F3F3F4;
-  --foreground: #37323E;
-  --accent: #6D6A75;
-  --secondary: #5AAA95;
-  --tertiary: #BB9F06;
+  --background: #f3f3f4;
+  --foreground: #37323e;
+  --accent: #6d6a75;
+  --secondary: #5aaa95;
+  --tertiary: #bb9f06;
 }
 
 @theme {
@@ -25,12 +25,21 @@ body {
   font-family: var(--font-dm-sans), Arial, Helvetica, sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-space-mono), Arial, Helvetica, sans-serif;
 }
 
 .control-section-header {
   @apply col-span-2 mb-3 text-base text-secondary;
+}
+
+.control-label {
+  @apply text-sm font-medium;
 }
 
 .control-divider {
