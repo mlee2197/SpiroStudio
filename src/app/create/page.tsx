@@ -388,10 +388,6 @@ export default function CreatePage() {
               value={lineColor}
               setValue={setLineColor}
             />
-            {/* Gradient Color 2 */}
-            <label htmlFor="enable-gradient" className="control-label">
-              Enable Gradient
-            </label>
 
             {/* Line Style */}
             <label htmlFor="line-style" className="control-label">
