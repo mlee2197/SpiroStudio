@@ -21,7 +21,7 @@
 
 .Indicator {
   border-radius: 0.25rem;
-  background-color: var(--color-gray-700);
+  background-color: var(--color-secondary);
   user-select: none;
 }
 
