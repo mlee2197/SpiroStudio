@@ -61,6 +61,7 @@ export default function CreatePage() {
     isAnimating,
     instantDrawSpirograph,
   } = useDrawing({
+    containerRef,
     canvasRef,
     controls: {
       showCircle,
@@ -92,7 +93,7 @@ export default function CreatePage() {
           SpiroStudio
         </Link>
       </div>
-      <div className="flex flex-col-reverse items-center justify-center h-[calc(100%-57px)] w-full md:flex-row">
+      <div className="flex flex-col-reverse items-center justify-center h-[calc(100%-57px)] w-full md:flex-row md:pr-3 md:gap-3">
         {/* Controls */}
         <div className="grid grid-rows-[auto_1fr] w-full max-w-[360px] h-full">
           {/* Top Buttons */}
@@ -438,7 +439,7 @@ export default function CreatePage() {
         </div>
 
         {/* Canvas */}
-        <div ref={containerRef} className="relative w-full flex-grow">
+        <div ref={containerRef} className="relative h-[calc(100%-24px)] w-full">
           <GridCanvas
             showGrid={showGrid.enabled}
             showSnap={snapToGrid}

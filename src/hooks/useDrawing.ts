@@ -3,6 +3,7 @@ import type { GridType, PathPreset, Point } from "@/types";
 import { generatePresetPath, getPointOnPath } from "@/helpers/CanvasUtils";
 
 interface UseDrawingProps {
+  containerRef: React.RefObject<HTMLDivElement | null>;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   controls: {
     showCircle: boolean;
@@ -23,7 +24,7 @@ interface UseDrawingProps {
   };
 }
 
-export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
+export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [pathPoints, setPathPoints] = useState<Point[]>([]);
   const animationRef = useRef<number>(null);
@@ -385,13 +386,18 @@ export function useDrawing({ canvasRef, controls }: UseDrawingProps) {
   };
 
   const exportImage = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Get the width and height of the div container
+    const rect = container.getBoundingClientRect();
+    const width = Math.round(rect.width);
+    const height = Math.round(rect.height);
 
     // Create a temporary canvas to export only the spirograph (without UI elements)
     const exportCanvas = document.createElement("canvas");
-    exportCanvas.width = canvas.width;
-    exportCanvas.height = canvas.height;
+    exportCanvas.width = width;
+    exportCanvas.height = height;
     const exportCtx = exportCanvas.getContext("2d");
     if (!exportCtx) return;
 

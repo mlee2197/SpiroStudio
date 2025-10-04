@@ -33,7 +33,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   }>;
 
   return (
-    <Tooltip.Provider delay={100}>
+    <Tooltip.Provider delay={50}>
       <Tooltip.Root>
         <Tooltip.Trigger onClick={onClick} disabled={disabled}>
           <div
