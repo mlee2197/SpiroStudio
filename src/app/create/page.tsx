@@ -465,7 +465,8 @@ export default function CreatePage() {
         {/* Canvas */}
         <div ref={containerRef} className="relative w-full flex-grow">
           <GridCanvas
-            show={showGrid.enabled}
+            showGrid={showGrid.enabled}
+            showSnap={snapToGrid}
             type={showGrid.type}
             gridSize={gridSize}
             containerRef={containerRef}
