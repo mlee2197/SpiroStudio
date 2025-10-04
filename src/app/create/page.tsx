@@ -14,6 +14,10 @@ import { useControls } from "@/hooks/useControls";
 import { useDrawing } from "@/hooks/useDrawing";
 import GridCanvas from "@/components/GridCanvas";
 import CustomTabs from "@/components/Tabs";
+import dynamic from "next/dynamic";
+const ColorPicker = dynamic(() => import("@/components/ColorPicker"), {
+  ssr: false,
+});
 
 export default function CreatePage() {
   const {
@@ -39,6 +43,8 @@ export default function CreatePage() {
     setPenSize,
     lineColor,
     setLineColor,
+    lineColor2,
+    setLineColor2,
     setShowGrid,
     setSnapToGrid,
     showGrid,
@@ -75,6 +81,7 @@ export default function CreatePage() {
       penStyle,
       penSize,
       lineColor,
+      lineColor2,
       backgroundColor,
       snapToGrid,
       gridSize,
@@ -101,6 +108,7 @@ export default function CreatePage() {
             <h2 className="text-xl font-semibold">Controls</h2>
             <CustomPopover
               title="How to use"
+              popupClassName="bg-white p-4 border border-gray-300 rounded shadow-lg"
               trigger={
                 <div
                   className="flex items-center justify-center w-6 h-6 mr-4 mt-[2px] border rounded-full  text-sm"
@@ -228,7 +236,7 @@ export default function CreatePage() {
             {(showGrid.enabled || snapToGrid) && (
               <>
                 {/* Grid Type */}
-                <label htmlFor="show-grid" className="text-sm font-medium">
+                <label className="text-sm font-medium">
                   Grid Type
                 </label>
                 <CustomTabs
@@ -370,24 +378,18 @@ export default function CreatePage() {
             <label htmlFor="background-color" className="text-sm font-medium">
               Background
             </label>
-            <input
-              id="background-color"
-              type="color"
+            <ColorPicker
               value={backgroundColor}
-              onChange={(e) => setBackgroundColor(e.target.value)}
-              className="w-full h-8 border rounded"
+              setValue={setBackgroundColor}
             />
 
             {/* Pen Color */}
             <label htmlFor="pen-color" className="text-sm font-medium">
               Pen Color
             </label>
-            <input
-              id="pen-color"
-              type="color"
+            <ColorPicker
               value={lineColor}
-              onChange={(e) => setLineColor(e.target.value)}
-              className="w-full h-8 border rounded"
+              setValue={setLineColor}
             />
 
             {/* Line Style */}
@@ -439,7 +441,10 @@ export default function CreatePage() {
         </div>
 
         {/* Canvas */}
-        <div ref={containerRef} className="relative h-[calc(100%-24px)] w-full">
+        <div
+          ref={containerRef}
+          className="relative grid h-[calc(100%-24px)] w-full"
+        >
           <GridCanvas
             showGrid={showGrid.enabled}
             showSnap={snapToGrid}
@@ -450,9 +455,7 @@ export default function CreatePage() {
           />
           <canvas
             ref={canvasRef}
-            // width={800}
-            // height={600}
-            className="relative w-full border border-border rounded-lg cursor-crosshair bg-transparent"
+            className="relative w-full border border-border rounded-lg cursor-crosshair bg-transparent [grid-area:1/1]"
             onClick={handleCanvasClick}
           />
           <div className="absolute top-4 left-4">

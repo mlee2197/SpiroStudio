@@ -6,9 +6,10 @@ interface CustomPopoverProps {
   children: React.ReactNode;
   trigger: React.ReactNode;
   title?: React.ReactNode;
+  popupClassName?: string;
 }
 
-export default function CustomPopover({ children, trigger, title }: CustomPopoverProps) {
+export default function CustomPopover({ children, trigger, title, popupClassName }: CustomPopoverProps) {
   return (
     <Popover.Root>
       <Popover.Trigger>
@@ -16,7 +17,7 @@ export default function CustomPopover({ children, trigger, title }: CustomPopove
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner sideOffset={8}>
-          <Popover.Popup className={styles.Popup}>
+          <Popover.Popup className={popupClassName}>
             <Popover.Arrow className={styles.Arrow}>
               <ArrowSvg />
             </Popover.Arrow>

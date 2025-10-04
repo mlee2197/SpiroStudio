@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { GridType, PenStyle } from "@/types";
+import { ColorType, GridType, PenStyle } from "@/types";
+import { RGBColor } from "react-color";
 
 export function useControls() {
   // Path and drawing controls
@@ -7,7 +8,7 @@ export function useControls() {
   const [showPath, setShowPath] = useState(true);
   const [showGrid, setShowGrid] = useState({
     enabled: false,
-    type: "grid" as GridType
+    type: "grid" as GridType,
   });
   const [gridSize, setGridSize] = useState(32);
   const [snapToGrid, setSnapToGrid] = useState(false);
@@ -25,8 +26,18 @@ export function useControls() {
   // Pen and style controls
   const [penStyle, setPenStyle] = useState<PenStyle>("line");
   const [penSize, setPenSize] = useState(2);
-  const [lineColor, setLineColor] = useState("#000000");
-  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
+  const [lineColor, setLineColor] = useState<ColorType>({
+    hex: "#000000",
+    rgb: { r: 0, g: 0, b: 0, a: 1 },
+  });
+  const [lineColor2, setLineColor2] = useState<ColorType>({
+    hex: "#5aaA95",
+    rgb: { r: 90, g: 170, b: 149, a: 1 },
+  });
+  const [backgroundColor, setBackgroundColor] = useState<ColorType>({
+    hex: "#ffffff",
+    rgb: { r: 255, g: 255, b: 255, a: 1 },
+  });
 
   return {
     showCircle,
@@ -51,6 +62,8 @@ export function useControls() {
     setPenSize,
     lineColor,
     setLineColor,
+    lineColor2,
+    setLineColor2,
     showGrid,
     setShowGrid,
     gridSize,
@@ -58,6 +71,6 @@ export function useControls() {
     snapToGrid,
     setSnapToGrid,
     backgroundColor,
-    setBackgroundColor
+    setBackgroundColor,
   };
 }

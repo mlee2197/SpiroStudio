@@ -1,4 +1,4 @@
-import { GridType } from "@/types";
+import { ColorType, GridType } from "@/types";
 import React, { useRef, useEffect, useState } from "react";
 
 interface GridCanvasProps {
@@ -7,7 +7,7 @@ interface GridCanvasProps {
   type: GridType;
   gridSize: number; // renamed from 'size' to 'gridSize'
   containerRef: React.RefObject<HTMLDivElement | null>;
-  backgroundColor: string;
+  backgroundColor: ColorType;
 }
 
 function GridCanvas({
@@ -76,7 +76,7 @@ function GridCanvas({
 
     // Clear
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = backgroundColor;
+    ctx.fillStyle = backgroundColor.hex;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (showGrid) {
@@ -167,7 +167,7 @@ function GridCanvas({
       ref={gridCanvasRef}
       width={size.width}
       height={size.height}
-      className="absolute top-0 left-0 w-full h-full pointer-events-none rounded-lg"
+      className="w-full h-full pointer-events-none rounded-lg [grid-area:1/1]"
       aria-hidden="true"
     />
   );

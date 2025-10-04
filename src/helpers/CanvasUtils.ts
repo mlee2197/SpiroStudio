@@ -271,3 +271,41 @@ export const getPointOnPath = (
 
   return points[0];
 };
+
+export function getGradientColorRGBA(
+  startRgba: { r: number; g: number; b: number; a?: number },
+  endRgba: { r: number; g: number; b: number; a?: number },
+  progress: number
+): string {
+  // Clamp progress between 0 and 1
+  progress = Math.max(0, Math.min(1, progress));
+
+  let r: number, g: number, b: number, a: number;
+
+  // Default alpha to 1 if not provided
+  const startA = typeof startRgba.a === "number" ? startRgba.a : 1;
+  const endA = typeof endRgba.a === "number" ? endRgba.a : 1;
+
+  if (progress <= 0.25) {
+    // 0% - 25%: start color
+    r = startRgba.r;
+    g = startRgba.g;
+    b = startRgba.b;
+    a = startA;
+  } else if (progress <= 0.75) {
+    // 25% - 75%: interpolate from start to end
+    const t = (progress - 0.25) / 0.5; // t goes from 0 to 1
+    r = startRgba.r + (endRgba.r - startRgba.r) * t;
+    g = startRgba.g + (endRgba.g - startRgba.g) * t;
+    b = startRgba.b + (endRgba.b - startRgba.b) * t;
+    a = startA + (endA - startA) * t;
+  } else {
+    // 75% - 100%: back to start color
+    r = startRgba.r;
+    g = startRgba.g;
+    b = startRgba.b;
+    a = startA;
+  }
+
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}

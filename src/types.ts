@@ -1,4 +1,8 @@
 export type Point = { x: number; y: number }
 export type PenStyle = "line" | "dots" | "dashes" | "circles" | "squares"
 export type PathPreset = "circle" | "ellipse" | "square" | "polygon" | "star" | "sine" | "spiral" | "heart" | "infinity" | "miffy";
-export type GridType = "grid" | "columns" | "rows"
+export type GridType = "grid" | "columns" | "rows";
+export type ColorType = {
+  hex: string;
+  rgb: { r: number; g: number; b: number; a?: number | undefined };
+}
