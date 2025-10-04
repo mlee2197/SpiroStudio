@@ -7,11 +7,11 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const baseStyles =
-  "inline-flex items-center justify-center rounded font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center justify-center rounded font-medium transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
 
 const variantStyles: Record<string, string> = {
-  default: "border border-primary text-primary bg-transparent hover:bg-gray-100",
-  outline: "border border-primary text-primary bg-transparent hover:bg-gray-100",
+  default: "border border-primary text-primary bg-transparent hover:bg-gray-200",
+  outline: "border border-primary text-primary bg-transparent hover:bg-gray-200",
   ghost: "bg-transparent text-primary hover:bg-gray-100",
 };
 

@@ -167,15 +167,7 @@ function GridCanvas({
       ref={gridCanvasRef}
       width={size.width}
       height={size.height}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: 0,
-      }}
+      className="absolute top-0 left-0 w-full h-full pointer-events-none rounded-lg"
       aria-hidden="true"
     />
   );

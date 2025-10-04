@@ -10,7 +10,7 @@ export default function CustomSlider(
 ) {
   return (
     <div className="flex items-center space-x-4">
-      <span className="border border-gray-300 rounded-sm text-xs p-1">
+      <span className="w-10 min-w-max border border-gray-300 rounded-sm text-center text-xs p-1">
         {props.value[0]}
         {props.unit}
       </span>

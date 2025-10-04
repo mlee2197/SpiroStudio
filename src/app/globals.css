@@ -28,3 +28,17 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-space-mono), Arial, Helvetica, sans-serif;
 }
+
+.control-section-header {
+  @apply col-span-2 mb-3 text-base text-secondary;
+}
+
+.control-divider {
+  @apply col-span-2 my-4 border-gray-400;
+}
+
+input[type="color"] {
+  box-sizing: border-box;
+  border: none;
+  cursor: pointer;
+}

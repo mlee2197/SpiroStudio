@@ -23,9 +23,9 @@
   appearance: none;
   color: var(--color-gray-600);
   font-family: inherit;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font-size: 12px;
   font-weight: 500;
+  -size: 14px;
   user-select: none;
   white-space: nowrap;
   word-break: keep-all;
