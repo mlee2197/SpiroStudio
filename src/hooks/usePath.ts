@@ -4,6 +4,7 @@ import { generatePresetPath } from "@/helpers/CanvasUtils";
 import { GridType, PathPreset, Point } from "@/types";
 import { useCallback, useEffect, useState } from "react";
 
+const RADIUS = 6; // Radius for detecting point clicks
 interface UsePathProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   controls: {
@@ -20,6 +21,68 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
   const [redoStack, setRedoStack] = useState<Point[][]>([]);
   const { showPath, gridSize, snapToGrid, gridType } = controls;
 
+  // Drag state
+  const [draggingPoint, setDraggingPoint] = useState<number | null>(null);
+
+  // Helper: get mouse position relative to canvas
+  const getMousePos = useCallback((e: MouseEvent | React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef?.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e as MouseEvent).clientX - rect.left,
+      y: (e as MouseEvent).clientY - rect.top,
+    };
+  }, [canvasRef]);
+
+  // Helper: returns the index of a nearby point, or -1 if none found
+  const getNearbyPointIndex = (x: number, y: number, points: Point[], radius: number = RADIUS) => {
+    for (let i = 0; i < points.length; i++) {
+      const dx = x - points[i].x;
+      const dy = y - points[i].y;
+      if (Math.sqrt(dx * dx + dy * dy) < radius) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
+  // Add/remove event listeners for mousemove/mouseup on window for smooth drag
+  useEffect(() => {
+    const handleMove = (e: MouseEvent) => {
+      if (!canvasRef?.current) return;
+      const { x, y } = getMousePos(e);
+      setPathPoints((prev) => {
+        if (draggingPoint === null) return prev;
+        const newPoints = prev.map((p, idx) =>
+          idx === draggingPoint ? { ...p, x, y } : p
+        );
+        return newPoints;
+      });
+    };
+    const handleUp = () => {
+      setDraggingPoint(null);
+    };
+    const handleMouseDown = (e: MouseEvent) => {
+      if (!canvasRef?.current) return;
+      const { x, y } = getMousePos(e);
+      // find nearest point
+      const idx = getNearbyPointIndex(x, y, pathPoints);
+      if (idx !== -1) {
+        setDraggingPoint(idx);
+      }
+    };
+
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    return () => {
+      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
+  }, [draggingPoint, canvasRef, pathPoints, getMousePos]);
+
   // Draw the user-defined path (polygon, etc)
   useEffect(() => {
     const canvas = canvasRef?.current;
@@ -34,7 +97,7 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
 
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "#888";
+    ctx.strokeStyle = "#999";
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
@@ -58,7 +121,7 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
     ctx.setLineDash([]);
     // Draw path points
     pathPoints.forEach((point, i) => {
-      ctx.fillStyle = i === 0 ? "#22c55e" : "#888";
+      ctx.fillStyle = i === 0 ? "#22c55e" : "#999";
       ctx.beginPath();
       ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
       ctx.fill();
@@ -76,6 +139,11 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
     const rect = canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
+
+    // Prevent adding a new point if the click is close to an existing point (to avoid conflict with dragging)
+    if (getNearbyPointIndex(x, y, pathPoints) !== -1) {
+      return;
+    }
 
     if (snapToGrid) {
       if (gridType === "grid") {
