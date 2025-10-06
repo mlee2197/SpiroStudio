@@ -46,6 +46,26 @@ h6 {
   @apply col-span-2 my-4 border-gray-400;
 }
 
+.canvas-button-group {
+  @apply flex space-x-2 p-2 rounded;
+  position: relative;
+}
+/* 
+.canvas-button-group::before {
+  content: attr(data-title);
+  display: block;
+  font-family: var(--font-space-mono), Arial, Helvetica, sans-serif;
+  font-size: 0.65rem;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+  position: absolute;
+  top: 0.25rem;
+  left: 0.75rem;
+  pointer-events: none;
+  opacity: 0.85;
+} */
+
 input[type="color"] {
   box-sizing: border-box;
   border: none;

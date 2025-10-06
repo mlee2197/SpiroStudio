@@ -105,7 +105,7 @@ export default function CreatePage() {
   const resetAll = () => {
     resetPath();
     clearDrawing();
-  }
+  };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -472,51 +472,60 @@ export default function CreatePage() {
           />
           <div className="absolute top-4 left-4">
             <Collapsible defaultOpen>
-              <div className="flex gap-2">
-                <IconButton
-                  icon={"SkipForward"}
-                  tooltip={"Instant Draw"}
-                  onClick={instantDrawSpirograph}
-                  bgColor="white"
-                />
-                <IconButton
-                  icon={isAnimating ? "Pause" : "Play"}
-                  tooltip={isAnimating ? "Pause" : "Play"}
-                  onClick={toggleAnimation}
-                  bgColor="white"
-                />
-                <IconButton
-                  icon="LineSquiggle"
-                  tooltip="Clear Drawing"
-                  onClick={clearDrawing}
-                  bgColor="#ecc1c1"
-                />
-                <IconButton
-                  icon="RefreshCcw"
-                  tooltip="Clear All"
-                  bgColor="#ecc1c1"
-                  onClick={resetAll}
-                />
-                <IconButton
-                  icon="Undo"
-                  tooltip="Undo"
-                  onClick={undo}
-                  bgColor="white"
-                  disabled={!canUndo}
-                />
-                <IconButton
-                  icon="Redo"
-                  tooltip="Redo"
-                  onClick={redo}
-                  bgColor="white"
-                  disabled={!canRedo}
-                />
-                <IconButton
-                  icon="Download"
-                  tooltip="Export PNG"
-                  onClick={exportImage}
-                  bgColor="white"
-                />
+              <div className="flex gap-3 md:gap-5">
+                {/* Playback Controls */}
+                <div className="canvas-button-group">
+                  <IconButton
+                    icon={"SkipForward"}
+                    tooltip={"Instant Draw"}
+                    onClick={instantDrawSpirograph}
+                    bgColor="white"
+                  />
+                  <IconButton
+                    icon={isAnimating ? "Pause" : "Play"}
+                    tooltip={isAnimating ? "Pause" : "Play"}
+                    onClick={toggleAnimation}
+                    bgColor="white"
+                  />
+                </div>
+                {/* Editing Controls */}
+                <div className="canvas-button-group">
+                  <IconButton
+                    icon="Undo"
+                    tooltip="Undo"
+                    onClick={undo}
+                    bgColor="white"
+                    disabled={!canUndo}
+                  />
+                  <IconButton
+                    icon="Redo"
+                    tooltip="Redo"
+                    onClick={redo}
+                    bgColor="white"
+                    disabled={!canRedo}
+                  />
+                  <IconButton
+                    icon="LineSquiggle"
+                    tooltip="Clear Drawing"
+                    onClick={clearDrawing}
+                    bgColor="#ecc1c1"
+                  />
+                  <IconButton
+                    icon="RefreshCcw"
+                    tooltip="Clear All"
+                    bgColor="#ecc1c1"
+                    onClick={resetAll}
+                  />
+                </div>
+                {/* Export Controls */}
+                <div className="canvas-button-group">
+                  <IconButton
+                    icon="Download"
+                    tooltip="Export PNG"
+                    onClick={exportImage}
+                    bgColor="white"
+                  />
+                </div>
               </div>
             </Collapsible>
           </div>
