@@ -98,6 +98,11 @@ export default function CreatePage() {
     setPathPoints,
   });
 
+  const resetAll = () => {
+    resetPath();
+    clearDrawing();
+  }
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="w-full px-4 py-3 border-b border-border">
@@ -483,10 +488,10 @@ export default function CreatePage() {
                   bgColor="#ecc1c1"
                 />
                 <IconButton
-                  icon="Waypoints"
-                  tooltip="Clear Path"
+                  icon="RefreshCcw"
+                  tooltip="Clear All"
                   bgColor="#ecc1c1"
-                  onClick={resetPath}
+                  onClick={resetAll}
                 />
                 <IconButton
                   icon="Download"
