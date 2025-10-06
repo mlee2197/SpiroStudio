@@ -15,6 +15,7 @@ import { useDrawing } from "@/hooks/useDrawing";
 import GridCanvas from "@/components/GridCanvas";
 import CustomTabs from "@/components/Tabs";
 import dynamic from "next/dynamic";
+import { usePath } from "@/hooks/usePath";
 const ColorPicker = dynamic(() => import("@/components/ColorPicker"), {
   ssr: false,
 });
@@ -53,14 +54,27 @@ export default function CreatePage() {
     setBackgroundColor,
   } = useControls();
 
-  const { containerRef, canvasRef } = useCanvas();
+  const { containerRef, canvasRef, pathCanvasRef } = useCanvas();
+
+  const {
+    pathPoints,
+    setPathPoints,
+    handleCanvasClick,
+    setPresetPath,
+    resetPath,
+  } = usePath({
+    canvasRef: pathCanvasRef,
+    controls: {
+      showPath,
+      gridSize,
+      snapToGrid,
+      gridType: showGrid.type,
+    },
+  });
 
   const {
     clearDrawing,
     exportImage,
-    handleCanvasClick,
-    resetAll,
-    setPresetPath,
     toggleAnimation,
     isAnimating,
     instantDrawSpirograph,
@@ -69,7 +83,6 @@ export default function CreatePage() {
     canvasRef,
     controls: {
       showCircle,
-      showPath,
       speed,
       outerCircleRadius,
       outerPenDistance,
@@ -80,10 +93,9 @@ export default function CreatePage() {
       penSize,
       lineColor,
       backgroundColor,
-      snapToGrid,
-      gridSize,
-      gridType: showGrid.type,
     },
+    pathPoints,
+    setPathPoints,
   });
 
   return (
@@ -250,10 +262,7 @@ export default function CreatePage() {
                 />
 
                 {/* Grid Size */}
-                <label
-                  htmlFor="grid-size-slider"
-                  className="control-label"
-                >
+                <label htmlFor="grid-size-slider" className="control-label">
                   Grid Size
                 </label>
                 <CustomSlider
@@ -275,10 +284,7 @@ export default function CreatePage() {
 
             <div className="col-span-2 text-sm font-semibold">Outer Circle</div>
 
-            <label
-              htmlFor="outer-radius-slider"
-              className="control-label"
-            >
+            <label htmlFor="outer-radius-slider" className="control-label">
               Radius
             </label>
             <CustomSlider
@@ -293,10 +299,7 @@ export default function CreatePage() {
               }
             />
 
-            <label
-              htmlFor="inner-distance-slider"
-              className="control-label"
-            >
+            <label htmlFor="inner-distance-slider" className="control-label">
               Pen Distance
             </label>
             <CustomSlider
@@ -327,10 +330,7 @@ export default function CreatePage() {
 
             {innerCircleEnabled && (
               <>
-                <label
-                  htmlFor="inner-radius-slider"
-                  className="control-label"
-                >
+                <label htmlFor="inner-radius-slider" className="control-label">
                   Radius
                 </label>
                 <CustomSlider
@@ -450,10 +450,16 @@ export default function CreatePage() {
             containerRef={containerRef}
             backgroundColor={backgroundColor}
           />
+
+          <canvas
+            ref={pathCanvasRef}
+            className="w-full h-full [grid-area:1/1] bg-transparent"
+            style={{ top: 0, left: 0 }}
+            onClick={isAnimating ? undefined : handleCanvasClick}
+          />
           <canvas
             ref={canvasRef}
-            className="relative w-full border border-border rounded-lg cursor-crosshair bg-transparent [grid-area:1/1]"
-            onClick={handleCanvasClick}
+            className="relative pointer-events-none w-full border border-border rounded-lg cursor-crosshair bg-transparent [grid-area:1/1] z-20"
           />
           <div className="absolute top-4 left-4">
             <Collapsible defaultOpen>
@@ -477,10 +483,10 @@ export default function CreatePage() {
                   bgColor="#ecc1c1"
                 />
                 <IconButton
-                  icon="RefreshCcw"
-                  tooltip="Clear All"
+                  icon="Waypoints"
+                  tooltip="Clear Path"
                   bgColor="#ecc1c1"
-                  onClick={resetAll}
+                  onClick={resetPath}
                 />
                 <IconButton
                   icon="Download"

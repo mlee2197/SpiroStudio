@@ -1,13 +1,12 @@
 import { useRef, useState, useEffect } from "react";
-import type { GridType, PathPreset, Point } from "@/types";
-import { generatePresetPath, getPointOnPath } from "@/helpers/CanvasUtils";
+import type { Point } from "@/types";
+import { getPointOnPath } from "@/helpers/CanvasUtils";
 
 interface UseDrawingProps {
   containerRef: React.RefObject<HTMLDivElement | null>;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   controls: {
     showCircle: boolean;
-    showPath: boolean;
     speed: number;
     outerCircleRadius: number;
     outerPenDistance: number;
@@ -18,15 +17,19 @@ interface UseDrawingProps {
     innerPenDistance: number;
     lineColor: string;
     backgroundColor: string;
-    gridSize: number;
-    snapToGrid: boolean;
-    gridType: GridType;
   };
+  pathPoints: Point[];
+  setPathPoints: React.Dispatch<React.SetStateAction<Point[]>>;
 }
 
-export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProps) {
+export function useDrawing({
+  containerRef,
+  canvasRef,
+  controls,
+  pathPoints,
+  setPathPoints,
+}: UseDrawingProps) {
   const [isAnimating, setIsAnimating] = useState(false);
-  const [pathPoints, setPathPoints] = useState<Point[]>([]);
   const animationRef = useRef<number>(null);
 
   // Refs for spirograph state
@@ -37,7 +40,6 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
 
   const {
     showCircle,
-    showPath,
     speed,
     outerCircleRadius,
     outerPenDistance,
@@ -48,57 +50,19 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     innerPenDistance,
     lineColor,
     backgroundColor,
-    gridSize,
-    snapToGrid,
-    gridType,
   } = controls;
 
-  /**
-   * This useEffect is responsible for rendering the entire canvas whenever any relevant state changes.
-   * It:
-   *  - Draws the user-defined path (if showPath is true).
-   *  - Draws the spirograph trail (the animated or instant-drawn pattern).
-   *  - Draws the current animation state: outer circle, outer pen, and (if enabled) inner circle and pen.
-   */
+  // Draw the spirograph trail and animation state
   useEffect(() => {
     const canvas = canvasRef?.current;
     if (!canvas) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    const ctx = context;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Helper: Draw the user path (polygon, etc)
-    function drawPath() {
-      if (pathPoints.length === 0 || !showPath) return;
-      ctx.save();
-      ctx.strokeStyle = "#888";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      ctx.beginPath();
-      ctx.moveTo(pathPoints[0].x, pathPoints[0].y);
-      for (let i = 1; i < pathPoints.length; i++) {
-        ctx.lineTo(pathPoints[i].x, pathPoints[i].y);
-      }
-      if (pathPoints.length > 1) {
-        ctx.lineTo(pathPoints[0].x, pathPoints[0].y);
-      }
-      ctx.stroke();
-      ctx.setLineDash([]);
-      // Draw path points
-      pathPoints.forEach((point, i) => {
-        ctx.fillStyle = i === 0 ? "#22c55e" : "#888";
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      ctx.restore();
-    }
-
-    // Helper: Draw the spirograph trail
-    function drawSpirographTrail() {
-      const points = spirographPointsRef.current;
-      if (!points || points.length === 0) return;
+    // Draw spirograph trail
+    const points = spirographPointsRef.current;
+    if (points && points.length > 0) {
       ctx.save();
       if (penStyle === "line" || penStyle === "dashes") {
         if (penStyle === "dashes") ctx.setLineDash([10, 5]);
@@ -144,9 +108,8 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
       ctx.restore();
     }
 
-    // Helper: Draw the current animation state (outer/inner circles and pens)
-    function drawAnimationState() {
-      if (!isAnimating || pathPoints.length <= 1 || !showCircle) return;
+    // Draw animation state (outer/inner circles and pens)
+    if (isAnimating && pathPoints.length > 1 && showCircle) {
       const currentPos = getPointOnPath(pathProgressRef.current, pathPoints);
 
       // Outer circle
@@ -204,11 +167,6 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
       }
       ctx.restore();
     }
-
-    // --- Main drawing routine ---
-    drawPath();
-    drawSpirographTrail();
-    drawAnimationState();
   }, [
     canvasRef,
     pathPoints,
@@ -222,16 +180,9 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     innerPenDistance,
     lineColor,
     showCircle,
-    showPath,
   ]);
 
-  /**
-   * This effect handles the animation of the spirograph drawing.
-   *
-   * - It animates the drawing step by step using requestAnimationFrame.
-   * - It updates the spirograph points, angles, and path progress, and triggers a re-render by updating pathPoints.
-   * - It also ensures that the animation frame is properly cleaned up when the effect is re-run or the component unmounts.
-   */
+  // Animation effect for spirograph
   useEffect(() => {
     if (!isAnimating || pathPoints.length < 2) return;
 
@@ -240,7 +191,6 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     const animate = () => {
       if (isCancelled) return;
 
-      // Normal animation mode
       pathProgressRef.current += speed / 1000;
       if (pathProgressRef.current >= 1) {
         pathProgressRef.current = 0;
@@ -270,7 +220,7 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
         spirographPointsRef.current = spirographPointsRef.current.slice(-10000);
       }
 
-      setPathPoints([...pathPoints]);
+      setPathPoints((prev) => [...prev]);
 
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -291,6 +241,7 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     outerPenDistance,
     innerCircleEnabled,
     innerPenDistance,
+    setPathPoints,
   ]);
 
   // Instant draw function for button (continues from last progress)
@@ -300,8 +251,6 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
       return;
     }
     const totalSteps = 1000;
-    // Reset spirograph points for instant draw
-    // Reset angles and progress for a clean instant draw
     let localPathProgress = 0;
     let localOuterAngle = outerAngleRef.current;
     let localInnerAngle = innerAngleRef.current;
@@ -327,18 +276,16 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
         spirographPointsRef.current.push({ x: outerPenX, y: outerPenY });
       }
     }
-    // Update refs to match the last state for consistency
     pathProgressRef.current = 1;
     outerAngleRef.current = localOuterAngle;
     innerAngleRef.current = localInnerAngle;
 
     setIsAnimating(false);
-    setPathPoints([...pathPoints]);
+    setPathPoints((prev) => [...prev]);
   };
 
-  const resetAll = () => {
+  const resetDrawing = () => {
     setIsAnimating(false);
-    setPathPoints([]);
     spirographPointsRef.current = [];
     pathProgressRef.current = 0;
     outerAngleRef.current = 0;
@@ -348,19 +295,9 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     }
   };
 
-  const setPresetPath = (preset: PathPreset) => {
-    if (!canvasRef.current) return;
-    const rect = canvasRef.current.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const points = generatePresetPath({
-      preset,
-      centerX,
-      centerY,
-      width: rect.width,
-      height: rect.height,
-    });
-    setPathPoints(points);
+  const clearDrawing = () => {
+    spirographPointsRef.current = [];
+    setPathPoints((prev) => [...prev]);
   };
 
   const toggleAnimation = () => {
@@ -380,21 +317,14 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     setIsAnimating(true);
   };
 
-  const clearDrawing = () => {
-    spirographPointsRef.current = [];
-    setPathPoints([...pathPoints]);
-  };
-
   const exportImage = () => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Get the width and height of the div container
     const rect = container.getBoundingClientRect();
     const width = Math.round(rect.width);
     const height = Math.round(rect.height);
 
-    // Create a temporary canvas to export only the spirograph (without UI elements)
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = width;
     exportCanvas.height = height;
@@ -404,7 +334,6 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     exportCtx.fillStyle = backgroundColor;
     exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
-    // Draw the spirograph pattern
     if (spirographPointsRef.current.length > 0) {
       const points = spirographPointsRef.current;
 
@@ -459,41 +388,13 @@ export function useDrawing({ containerRef, canvasRef, controls }: UseDrawingProp
     link.click();
   };
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (isAnimating || !canvasRef?.current) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    if (snapToGrid) {
-      if (gridType === "grid") {
-        // Snap both x and y to nearest grid intersection
-        x = Math.round(x / gridSize) * gridSize;
-        y = Math.round(y / gridSize) * gridSize;
-      } else if (gridType === "columns") {
-        // Snap x to nearest column, y remains free
-        x = Math.round(x / gridSize) * gridSize;
-      } else if (gridType === "rows") {
-        // Snap y to nearest row, x remains free
-        y = Math.round(y / gridSize) * gridSize;
-      }
-    }
-
-    setPathPoints([...pathPoints, { x, y }]);
-  };
-
   return {
-    resetAll,
-    setPresetPath,
-    toggleAnimation,
+    resetDrawing,
     clearDrawing,
+    toggleAnimation,
     exportImage,
-    handleCanvasClick,
     isAnimating,
     instantDrawSpirograph,
+    spirographPointsRef,
   };
 }

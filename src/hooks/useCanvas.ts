@@ -7,20 +7,20 @@ import { useRef, useEffect } from "react";
 export function useCanvas() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pathCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // handle dynamic canvas size
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
-        if (canvasRef.current) {
-          // Only update the canvas size if it actually changed, to avoid rescaling artifacts
-          const displayWidth = Math.floor(width);
-          const displayHeight = Math.floor(height);
-          const pixelWidth = Math.floor(width * devicePixelRatio);
-          const pixelHeight = Math.floor(height * devicePixelRatio);
+        const displayWidth = Math.floor(width);
+        const displayHeight = Math.floor(height);
+        const pixelWidth = Math.floor(width * devicePixelRatio);
+        const pixelHeight = Math.floor(height * devicePixelRatio);
 
-          // Only reset the canvas size if it changed, to avoid rescaling the context
+        // Update main canvas
+        if (canvasRef.current) {
           if (
             canvasRef.current.width !== pixelWidth ||
             canvasRef.current.height !== pixelHeight
@@ -31,11 +31,29 @@ export function useCanvas() {
           canvasRef.current.style.width = `${displayWidth}px`;
           canvasRef.current.style.height = `${displayHeight}px`;
 
-          // Always reset the transform before scaling to avoid compounding
           const ctx = canvasRef.current.getContext("2d");
           if (ctx) {
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.scale(devicePixelRatio, devicePixelRatio);
+          }
+        }
+
+        // Update path canvas
+        if (pathCanvasRef.current) {
+          if (
+            pathCanvasRef.current.width !== pixelWidth ||
+            pathCanvasRef.current.height !== pixelHeight
+          ) {
+            pathCanvasRef.current.width = pixelWidth;
+            pathCanvasRef.current.height = pixelHeight;
+          }
+          pathCanvasRef.current.style.width = `${displayWidth}px`;
+          pathCanvasRef.current.style.height = `${displayHeight}px`;
+
+          const ctxPath = pathCanvasRef.current.getContext("2d");
+          if (ctxPath) {
+            ctxPath.setTransform(1, 0, 0, 1, 0, 0);
+            ctxPath.scale(devicePixelRatio, devicePixelRatio);
           }
         }
       }
@@ -44,7 +62,7 @@ export function useCanvas() {
     updateSize();
     window.addEventListener("resize", updateSize);
     return () => window.removeEventListener("resize", updateSize);
-  }, [canvasRef]);
+  }, [canvasRef, pathCanvasRef]);
 
-  return { canvasRef, containerRef };
+  return { canvasRef, containerRef, pathCanvasRef };
 }

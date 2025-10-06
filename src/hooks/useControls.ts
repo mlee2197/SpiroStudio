@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { ColorType, GridType, PenStyle } from "@/types";
-import { RGBColor } from "react-color";
+import { GridType, PenStyle } from "@/types";
 
 export function useControls() {
   // Path and drawing controls
