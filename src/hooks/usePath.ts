@@ -24,6 +24,9 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
   // Drag state
   const [draggingPoint, setDraggingPoint] = useState<number | null>(null);
 
+  // Hover state for highlighting points
+  const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
+
   // Helper: get mouse position relative to canvas
   const getMousePos = useCallback((e: MouseEvent | React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef?.current;
@@ -49,9 +52,15 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
 
   // Add/remove event listeners for mousemove/mouseup on window for smooth drag
   useEffect(() => {
+    if (!canvasRef?.current) return;
+    const canvas = canvasRef.current;
     const handleMove = (e: MouseEvent) => {
-      if (!canvasRef?.current) return;
       const { x, y } = getMousePos(e);
+
+      // Update hovered point for highlight
+      const idx = getNearbyPointIndex(x, y, pathPoints);
+      setHoveredPoint(idx);
+
       setPathPoints((prev) => {
         if (draggingPoint === null) return prev;
         const newPoints = prev.map((p, idx) =>
@@ -72,14 +81,17 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
         setDraggingPoint(idx);
       }
     };
-
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("mouseup", handleUp);
+    const handleMouseLeave = () => setHoveredPoint(null);
+    
+    canvas.addEventListener("mouseleave", handleMouseLeave);
+    canvas.addEventListener("mousedown", handleMouseDown);
+    canvas.addEventListener("mousemove", handleMove);
+    canvas.addEventListener("mouseup", handleUp);
     return () => {
-      window.removeEventListener("mousedown", handleMouseDown);
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mouseup", handleUp);
+      canvas.removeEventListener("mousedown", handleMouseDown);
+      canvas.removeEventListener("mousemove", handleMove);
+      canvas.removeEventListener("mouseup", handleUp);
+      canvas.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, [draggingPoint, canvasRef, pathPoints, getMousePos]);
 
@@ -121,13 +133,16 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
     ctx.setLineDash([]);
     // Draw path points
     pathPoints.forEach((point, i) => {
-      ctx.fillStyle = i === 0 ? "#22c55e" : "#999";
+      let fillStyle = "#999";
+      if (i === 0) fillStyle = "#22c55e";
+      if (i === hoveredPoint) fillStyle = "#2563eb"; // blue-600
+      ctx.fillStyle = fillStyle;
       ctx.beginPath();
       ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
       ctx.fill();
     });
     ctx.restore();
-  }, [canvasRef, pathPoints, showPath]);
+  }, [canvasRef, pathPoints, showPath, hoveredPoint]);
 
   // Handle canvas click to add points to the path
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
