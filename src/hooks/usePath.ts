@@ -2,7 +2,7 @@
 
 import { generatePresetPath } from "@/helpers/CanvasUtils";
 import { GridType, PathPreset, Point } from "@/types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface UsePathProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -16,6 +16,8 @@ interface UsePathProps {
 
 export function usePath({ canvasRef, controls }: UsePathProps) {
   const [pathPoints, setPathPoints] = useState<Point[]>([]);
+  const [undoStack, setUndoStack] = useState<Point[][]>([]);
+  const [redoStack, setRedoStack] = useState<Point[][]>([]);
   const { showPath, gridSize, snapToGrid, gridType } = controls;
 
   // Draw the user-defined path (polygon, etc)
@@ -28,7 +30,7 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
     if (!showPath || pathPoints.length === 0) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       return;
-    };
+    }
 
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -86,8 +88,82 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
       }
     }
 
+    setUndoStack((prev) => [...prev, pathPoints]);
+    setRedoStack([]); // Clear redo stack on new action
     setPathPoints((prev) => [...prev, { x, y }]);
   };
+
+  // Undo the last action
+  const undo = useCallback(() => {
+    setUndoStack((prevUndoStack) => {
+      if (prevUndoStack.length === 0) return prevUndoStack;
+      const last = prevUndoStack[prevUndoStack.length - 1];
+      // Only push to redoStack if the last pathPoints is not the same as the last redoStack entry
+      setRedoStack((prevRedoStack) => {
+        if (
+          prevRedoStack.length > 0 &&
+          prevRedoStack[prevRedoStack.length - 1] === pathPoints
+        ) {
+          return prevRedoStack;
+        }
+        return [...prevRedoStack, pathPoints];
+      });
+      setPathPoints(last);
+      return prevUndoStack.slice(0, -1);
+    });
+  }, [pathPoints]);
+
+  // Redo the last undone action
+  const redo = useCallback(() => {
+    setRedoStack((prevRedoStack) => {
+      if (prevRedoStack.length === 0) return prevRedoStack;
+      const last = prevRedoStack[prevRedoStack.length - 1];
+      // Only push to undoStack if the last pathPoints is not the same as the last undoStack entry
+      setUndoStack((prevUndoStack) => {
+        if (
+          prevUndoStack.length > 0 &&
+          prevUndoStack[prevUndoStack.length - 1] === pathPoints
+        ) {
+          return prevUndoStack;
+        }
+        return [...prevUndoStack, pathPoints];
+      });
+      setPathPoints(last);
+      return prevRedoStack.slice(0, -1);
+    });
+  }, [pathPoints]);
+
+  const canUndo = undoStack.length > 0;
+  const canRedo = redoStack.length > 0;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isMac = /Mac/i.test(navigator.userAgent);
+      const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+
+      // Undo: Ctrl+Z or Cmd+Z (without Shift)
+      if (ctrlOrCmd && e.key.toLowerCase() === "z" && !e.shiftKey) {
+        e.preventDefault();
+        if (canUndo) undo();
+        return;
+      }
+      // Redo: Ctrl+Y or Cmd+Y, or Ctrl+Shift+Z or Cmd+Shift+Z
+      if (
+        ctrlOrCmd &&
+        (e.key.toLowerCase() === "y" ||
+          (e.key.toLowerCase() === "z" && e.shiftKey))
+      ) {
+        e.preventDefault();
+        if (canRedo) redo();
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [canUndo, canRedo, undo, redo]);
 
   // Set a preset path
   const setPresetPath = (preset: PathPreset) => {
@@ -102,11 +178,15 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
       width: rect.width,
       height: rect.height,
     });
+    setUndoStack((prev) => [...prev, pathPoints]);
+    setRedoStack([]); // Clear redo stack on new action
     setPathPoints(points);
   };
 
   // Reset the path
   const resetPath = () => {
+    setUndoStack((prev) => [...prev, pathPoints]);
+    setRedoStack([]); // Clear redo stack on new action
     setPathPoints([]);
     canvasRef.current
       ?.getContext("2d")
@@ -119,5 +199,9 @@ export function usePath({ canvasRef, controls }: UsePathProps) {
     handleCanvasClick,
     setPresetPath,
     resetPath,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
   };
 }

@@ -62,6 +62,10 @@ export default function CreatePage() {
     handleCanvasClick,
     setPresetPath,
     resetPath,
+    canRedo,
+    canUndo,
+    redo,
+    undo,
   } = usePath({
     canvasRef: pathCanvasRef,
     controls: {
@@ -492,6 +496,20 @@ export default function CreatePage() {
                   tooltip="Clear All"
                   bgColor="#ecc1c1"
                   onClick={resetAll}
+                />
+                <IconButton
+                  icon="Undo"
+                  tooltip="Undo"
+                  onClick={undo}
+                  bgColor="white"
+                  disabled={!canUndo}
+                />
+                <IconButton
+                  icon="Redo"
+                  tooltip="Redo"
+                  onClick={redo}
+                  bgColor="white"
+                  disabled={!canRedo}
                 />
                 <IconButton
                   icon="Download"
