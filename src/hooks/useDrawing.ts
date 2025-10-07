@@ -318,74 +318,30 @@ export function useDrawing({
   };
 
   const exportImage = () => {
-    const container = containerRef.current;
-    if (!container) return;
+    if (!canvasRef.current) return;
 
-    const rect = container.getBoundingClientRect();
-    const width = Math.round(rect.width);
-    const height = Math.round(rect.height);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    const exportCanvas = document.createElement("canvas");
-    exportCanvas.width = width;
-    exportCanvas.height = height;
-    const exportCtx = exportCanvas.getContext("2d");
-    if (!exportCtx) return;
+    // Save current canvas as image
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-    exportCtx.fillStyle = backgroundColor;
-    exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    // Draw background color
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
 
-    if (spirographPointsRef.current.length > 0) {
-      const points = spirographPointsRef.current;
-
-      if (penStyle === "line" || penStyle === "dashes") {
-        if (penStyle === "dashes") {
-          exportCtx.setLineDash([10, 5]);
-        }
-
-        exportCtx.strokeStyle = lineColor;
-        exportCtx.lineWidth = penSize;
-        exportCtx.lineCap = "round";
-        exportCtx.lineJoin = "round";
-
-        exportCtx.beginPath();
-        exportCtx.moveTo(points[0].x, points[0].y);
-        for (let i = 1; i < points.length; i++) {
-          exportCtx.lineTo(points[i].x, points[i].y);
-        }
-        exportCtx.stroke();
-      } else if (
-        penStyle === "dots" ||
-        penStyle === "circles" ||
-        penStyle === "squares"
-      ) {
-        exportCtx.fillStyle = lineColor;
-        points.forEach((point) => {
-          if (penStyle === "dots") {
-            exportCtx.beginPath();
-            exportCtx.arc(point.x, point.y, penSize / 2, 0, Math.PI * 2);
-            exportCtx.fill();
-          } else if (penStyle === "circles") {
-            exportCtx.strokeStyle = lineColor;
-            exportCtx.lineWidth = 1;
-            exportCtx.beginPath();
-            exportCtx.arc(point.x, point.y, penSize, 0, Math.PI * 2);
-            exportCtx.stroke();
-          } else if (penStyle === "squares") {
-            exportCtx.fillRect(
-              point.x - penSize / 2,
-              point.y - penSize / 2,
-              penSize,
-              penSize
-            );
-          }
-        });
-      }
-    }
-
+    // Export image
     const link = document.createElement("a");
     link.download = `spirograph-${Date.now()}.png`;
-    link.href = exportCanvas.toDataURL("image/png");
+    link.href = canvas.toDataURL("image/png");
     link.click();
+
+    // Restore original canvas
+    ctx.putImageData(imageData, 0, 0);
   };
 
   return {
