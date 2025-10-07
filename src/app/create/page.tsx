@@ -472,7 +472,7 @@ export default function CreatePage() {
           />
           <div className="absolute top-4 left-4">
             <Collapsible defaultOpen>
-              <div className="flex gap-3 md:gap-5">
+              <div className="relative flex gap-3 z-100 md:gap-5">
                 {/* Playback Controls */}
                 <div className="canvas-button-group">
                   <IconButton
