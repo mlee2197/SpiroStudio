@@ -18,6 +18,22 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "SpiroStudio",
   description: "Generate mesmerizing spirograph art with ease.",
+  openGraph: {
+    title: "SpiroStudio",
+    description: "Generate mesmerizing spirograph art with ease.",
+    url: "https://spiro-studio.vercel.app/",
+    siteName: "SpiroStudio",
+    images: [
+      {
+        url: "https://spiro-studio.vercel.app/logo.svg",
+        width: 512,
+        height: 512,
+        alt: "SpiroStudio Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
