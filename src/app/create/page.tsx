@@ -16,6 +16,7 @@ import GridCanvas from "@/components/GridCanvas";
 import CustomTabs from "@/components/Tabs";
 import dynamic from "next/dynamic";
 import { usePath } from "@/hooks/usePath";
+import Image from "next/image";
 const ColorPicker = dynamic(() => import("@/components/ColorPicker"), {
   ssr: false,
 });
@@ -112,9 +113,16 @@ export default function CreatePage() {
       <div className="w-full px-4 py-3 border-b border-border">
         <Link
           href="/"
-          className="text-2xl font-bold text-primary hover:underline transition-colors"
+          className="flex items-center gap-2 text-2xl font-bold text-primary hover:underline transition-colors"
           style={{ cursor: "pointer" }}
         >
+          <Image
+            src="/logo.svg"
+            alt="SpiroStudio Logo"
+            width={32}
+            height={32}
+            className="inline-block"
+            />
           SpiroStudio
         </Link>
       </div>

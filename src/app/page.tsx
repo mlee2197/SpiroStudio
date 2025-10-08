@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Home() {
   return (
     <div className="relative h-screen flex flex-col justify-center align-center">
@@ -24,6 +26,13 @@ export default function Home() {
         style={{ zIndex: 0 }}
       />
       <header className="text-center px-8">
+        <Image
+          src="/logo.svg"
+          alt="SpiroStudio Logo"
+          width={108}
+          height={108}
+          className="inline-block mb-6"
+        />
         <h1 className="text-4xl text-primary font-medium mb-2">SpiroStudio</h1>
         <h2 className="max-w-xl mb-8 mx-auto text-xl text-secondary">
           Create mesmerizing geometric art with the timeless beauty of
