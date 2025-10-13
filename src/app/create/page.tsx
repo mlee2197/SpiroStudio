@@ -457,7 +457,7 @@ export default function CreatePage() {
         {/* Canvas */}
         <div
           ref={containerRef}
-          className="relative grid h-[calc(100%-24px)] w-full"
+          className="relative grid h-[calc(100%-24px)] min-h-[320px] w-full"
         >
           <GridCanvas
             showGrid={showGrid.enabled}
@@ -478,9 +478,9 @@ export default function CreatePage() {
             ref={canvasRef}
             className="relative pointer-events-none w-full border border-border rounded-lg cursor-crosshair bg-transparent [grid-area:1/1] z-20"
           />
-          <div className="absolute top-4 left-4">
+          <div className="absolute top-1 left-1 md:top-4 md:left-4">
             <Collapsible defaultOpen>
-              <div className="relative flex gap-3 z-100 md:gap-5">
+              <div className="relative flex gap-2 z-100 md:gap-5">
                 {/* Playback Controls */}
                 <div className="canvas-button-group">
                   <IconButton
